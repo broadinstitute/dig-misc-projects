@@ -1,0 +1,102 @@
+
+#The project
+#------------
+!config /humgen/diabetes/users/tgreen/projects/ldscore/config/multi_tissue.cfg
+!title Multi Tisssue Project 1
+
+project1 class project
+chrm{1..22} class chromosome
+chromosome parent project
+
+chrm1 chromosome_number 1
+chrm2 chromosome_number 2
+chrm3 chromosome_number 3
+chrm4 chromosome_number 4
+chrm5 chromosome_number 5
+chrm6 chromosome_number 6
+chrm7 chromosome_number 7
+chrm8 chromosome_number 8
+chrm9 chromosome_number 9
+chrm10 chromosome_number 10
+chrm11 chromosome_number 11
+chrm12 chromosome_number 12
+chrm13 chromosome_number 13
+chrm14 chromosome_number 14
+chrm15 chromosome_number 15
+chrm16 chromosome_number 16
+chrm17 chromosome_number 17
+chrm18 chromosome_number 18
+chrm19 chromosome_number 19
+chrm20 chromosome_number 20
+chrm21 chromosome_number 21
+chrm22 chromosome_number 22
+
+{1..53} class tissue
+control class tissue
+tissue parent chromosome
+
+Pancreas class tissue_name
+Uterus class tissue_name
+Spleen class tissue_name
+Colon_Sigmoid class tissue_name
+Liver class tissue_name
+Stomach class tissue_name
+Kidney_Cortex class tissue_name
+Nerve_Tibial class tissue_name
+Esophagus_Mucosa class tissue_name
+Small_Intestine_Terminal_Ileum class tissue_name
+Cervix_Ectocervix class tissue_name
+Cervix_Endocervix class tissue_name
+Brain_Cerebellum class tissue_name
+Brain_Caudate_(basal_ganglia) class tissue_name
+Heart_Left_Ventricle class tissue_name
+Whole_Blood class tissue_name
+Artery_Tibial class tissue_name
+Minor_Salivary_Gland class tissue_name
+Thyroid class tissue_name
+Brain_Spinal_cord_(cervical_c-1) class tissue_name
+Brain_Hypothalamus class tissue_name
+Brain_Amygdala class tissue_name
+Brain_Cerebellar_Hemisphere class tissue_name
+Cells_Transformed_fibroblasts class tissue_name
+Adipose_Subcutaneous class tissue_name
+Brain_Cortex class tissue_name
+Muscle_Skeletal class tissue_name
+Brain_Frontal_Cortex_(BA9) class tissue_name
+Artery_Aorta class tissue_name
+Testis class tissue_name
+Adipose_Visceral_(Omentum) class tissue_name
+Cells_EBV-transformed_lymphocytes class tissue_name
+Fallopian_Tube class tissue_name
+Colon_Transverse class tissue_name
+Vagina class tissue_name
+Brain_Hippocampus class tissue_name
+Skin_Not_Sun_Exposed_(Suprapubic) class tissue_name
+Brain_Anterior_cingulate_cortex_(BA24) class tissue_name
+Lung class tissue_name
+Brain_Nucleus_accumbens_(basal_ganglia) class tissue_name
+Adrenal_Gland class tissue_name
+Heart_Atrial_Appendage class tissue_name
+Prostate class tissue_name
+Brain_Putamen_(basal_ganglia) class tissue_name
+Skin_Sun_Exposed_(Lower_leg) class tissue_name
+Ovary class tissue_name
+Esophagus_Gastroesophageal_Junction class tissue_name
+Breast_Mammary_Tissue class tissue_name
+Pituitary class tissue_name
+Bladder class tissue_name
+Artery_Coronary class tissue_name
+Brain_Substantia_nigra class tissue_name
+Esophagus_Muscularis class tissue_name
+tissue_name parent project
+
+T2D class phenotype
+T2D parent project
+
+
+!key base_dir /humgen/diabetes/users/tgreen/ldscore
+!key unix_out_dir $base_dir/out
+!key log_dir $base_dir/log
+!key web_out_dir http://iwww.broadinstitute.org/~tgreen/ldscore_out
+#!key max_jobs 10
+#!key max_sge_batch 1
