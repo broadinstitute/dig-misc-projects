@@ -1,0 +1,41 @@
+
+#The project
+#------------
+!config /humgen/diabetes/users/tgreen/projects/metal/config/metal.cfg
+!title Metal Baseline Experiment 2
+
+experiment2 class project
+ExSeq_52k_dv2 class dataset
+ExSeq_26k_dv2 class dataset
+ExSeq_19k_dv2 class dataset
+ExSeq_17k_dv2 class dataset
+ExSeq_13k_dv1 class dataset
+GWAS_DIAGRAM_dv3 class dataset
+ExChip_ExTexT2D_dv1 class dataset
+
+ExSeq_52k_dv2 number_of_samples 52000
+ExSeq_26k_dv2 number_of_samples 26000
+ExSeq_19k_dv2 number_of_samples 19000
+ExSeq_17k_dv2 number_of_samples 17000
+ExSeq_13k_dv1 number_of_samples 13000
+GWAS_DIAGRAM_dv3 number_of_samples 159208
+ExChip_ExTexT2D_dv1 number_of_samples 228653
+
+dataset parent project
+
+COMMON class variant_category
+COMMON maf 0.05
+ALL class variant_category
+ALL maf 0.00
+variant_category parent project
+ON class overlap
+ON overlap_property ON
+OFF overlap_property OFF
+OFF class overlap
+overlap parent variant_category
+
+
+!key base_dir /humgen/diabetes/users/tgreen/metal
+!key unix_out_dir $base_dir/out
+!key log_dir $base_dir/log
+!key web_out_dir http://iwww.broadinstitute.org/~tgreen/metal_out
