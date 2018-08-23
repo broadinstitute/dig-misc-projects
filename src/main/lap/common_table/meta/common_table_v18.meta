@@ -1,0 +1,19 @@
+#The project
+#------------
+!config /humgen/diabetes/users/tgreen/projects/common_table/config/common_table.cfg
+!title Common Table Version 18
+
+common.v18 class project
+{1..22} class chromosome
+X class chromosome
+MT class chromosome
+chromosome parent project
+
+#mysql_common_table prop scalar
+project mysql_common_table common_dv18
+project mysql_common_multi_allelic_table common_dv15_multi
+
+!key base_dir /humgen/diabetes/users/tgreen/common_table
+!key unix_out_dir $base_dir/out
+!key log_dir $base_dir/log
+!key web_out_dir http://iwww.broadinstitute.org/~tgreen/common_table_out
