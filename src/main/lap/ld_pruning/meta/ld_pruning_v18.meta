@@ -1,0 +1,40 @@
+!config /humgen/diabetes/users/tgreen/projects/ld_pruning/config/ld_pruning.cfg
+!title LD pruning
+
+#Paths to output directories
+#------
+!key base_dir /humgen/diabetes/users/tgreen/ld_pruning/
+!key unix_out_dir $base_dir/out
+!key log_dir $base_dir/log
+!key web_out_dir http://iwww.broadinstitute.org/~tgreen/ld_pruning/
+
+#General run properties
+#------
+!key default_umask 002
+#!key max_jobs 2 
+#!key max_sge_batch 10
+
+#The project
+#------------
+
+ld_pruning.v18 class project
+project mysql_common_table common_dv18
+project mysql_clump_table common_v18_clump_exclude
+
+pointone class r2
+pointtwo class r2
+pointfour class r2
+pointsix class r2
+pointeight class r2
+r2 parent project
+
+pointone threshold 0.1
+pointtwo threshold 0.2
+pointfour threshold 0.4
+pointsix threshold 0.6
+pointeight threshold 0.8
+
+{1..22} class chromosome
+#X class chromosome
+#Y class chromosome
+chromosome parent r2
