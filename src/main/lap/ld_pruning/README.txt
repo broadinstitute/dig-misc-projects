@@ -33,7 +33,7 @@ run this step only on one r2 value so commands arent' repeated.
 6. perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd make_clump_exclude --bsub
 7. perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_loader_point --bsub ( this will run all sql_loader_point*)
 8. perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_upload_cmd --bsub *
-/* to limit the number of jobs running against db uncomment these lines.  This should be taken care of by bsub_batch option but I have not been 
+/* to limit the number of jobs running on db uncomment these lines.  This should be taken care of by bsub_batch option but I have not been 
 able to get this working so I using these configuration options on database access jobs.
   key max_jobs 2 
   key max_sge_batch 10
