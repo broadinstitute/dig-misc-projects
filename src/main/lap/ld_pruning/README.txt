@@ -18,7 +18,7 @@ LAP PIPELINE COMMANDS
    sql_loader_pointfour
    sql_loader_pointsix
    sql_loader_pointeight
-8. sql_upload_cmd - upload .sql files to database
+
 
 
 How to Run
