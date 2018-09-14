@@ -1,0 +1,18 @@
+
+!config /humgen/diabetes/users/tgreen/projects/gwas_proximity/config/gwas_proximity.cfg
+!title Common Table
+#Paths to output directories
+#------
+!key base_dir /humgen/diabetes/users/tgreen/gwas_proximity
+!key unix_out_dir $base_dir/out
+!key log_dir $base_dir/log
+!key web_out_dir http://iwww.broadinstitute.org/~tgreen/gwas_proximity_out
+#General run properties
+#------
+!key default_umask 002
+
+09142018 class project
+{1..22} class chromosome
+X class chromosome
+MT class chromosome
+chromosome parent project
