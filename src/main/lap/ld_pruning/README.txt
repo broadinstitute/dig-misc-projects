@@ -102,7 +102,27 @@ _________________
 2.3 Create .annot file containing association statistice for the dataset being clumped
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  get_plink_annot_from_portal.pl
+  Script: get_plink_annot_from_portal.pl
+
+  usage perl -I$dig_jenkins_lib get_plink_annot_from_portal.pl
+
+  --dbi-configuration <dbi_configuration>
+
+  --common-table mysql_common_table
+
+  --pvalue-threshold <pvalue_threshold>
+
+  --out <portal_association_annot>
+
+  --chr <chromosome>
+
+  --dataset-table <dataset_table>
+
+
+
+  For clumping, plink needs the association statistics for each dataset
+  and chromosome for each dataset
+
 
    CHROM  SNP                 BP  A1    F_A  F_U  A2  CHISQ          P                  BETA 
   -------------------------------------------------------------------------------------------
@@ -120,20 +140,70 @@ _________________
 2.4 Run Clump
 ~~~~~~~~~~~~~
 
-  Here is the clump command short cmd ld_run_clump=plink\ --clump-p1 0.1
-  \ -clump-p2 0.1 \ -clump-r2 [.1,.2,.4,.6,.8] \ --allow-no-sex \
-  --noweb \ --bed,phase3_1kg_common_bed --bim,portal_bim
+  Here is the clump command short cmd ld_run_clump=plink --clump-p1 0.1
+  -clump-p2 0.1 -clump-r2 [.1,.2,.4,.6,.8] --allow-no-sex --noweb
+  --bed,phase3_1kg_common_bed --bim,portal_bim
   --fam,phase3_1kg_common_fam --clump portal_association_annot
   --extract,portal_snp_extract --chr <chr> --out
+
+
+   CHR  F  SNP                    BP         P  TOTAL  NSIG  S05  S01  S001  S0001  SP2                                       
+  ----------------------------------------------------------------------------------------------------------------------------
+    17  1  17_79415386_C_T  79415386  1.57e-05     17     6    9    2     0      0  17_79412885_T_A(1),17_79413112_C_A(1),etc 
+    17  1  17_79036337_C_G  79036337  2.66e-05      3     0    0    3     0      0  17_79033694_C_T(1),17_79034115_A_G(1),etc 
+    17  1  17_77935805_C_T  77935805  2.86e-05     13     0    2    4     2      5  17_77928017_C_G(1),17_77929817_T_G(1),etc 
+
+
+  Variants in SP2 are represented by variant in SNP
 
 
 2.5 Make Exclude
 ~~~~~~~~~~~~~~~~
 
+  This step takes the last column of the previous step and creates list
+  of variants that can be excluede at each r2 level perl -lane 'my
+  \$this= \$F[1];my @a=split(",",\$this); map {s/\(.+\)//g;} @a;foreach
+  \$a (@a) {print \$a if length(\$a)>5}' clump_file > clump_exclude
+
+   17_79413436_T_C 
+   17_79413475_C_A 
+   17_79414307_A_G 
+   17_79414914_A_G 
+   17_79415766_G_A 
+   17_79416454_A_G 
+   17_79417528_T_C 
+   17_79418260_A_G 
+
 
 2.6 Make Unique Exclude SQl
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+  Next step is to make succesive unique exclude lists into sql format
+  for upload.  Find all excludes unique to .1,then to .2 then .4 etc.
+  Basic idea cat list.1 list.2 list.2 list.4 list.4 list.6 list.6 list.8
+  list.8 | sort | uniq > uniq.q
+
+
+   17_10023426_C_T  WGS_GoT2D_dv1__T2D  T2D          0.1 
+   17_102384_T_A    WGS_GoT2D_dv1__T2D  T2D          0.1 
+   17_10393249_G_T  WGS_GoT2D_dv1__T2D  T2D          0.1 
+   17_10522041_G_T  WGS_GoT2D_dv1__T2D  T2D          0.1 
+   17_10524747_A_G  WGS_GoT2D_dv1__T2D  T2D          0.1 
+   17_10711174_C_A  WGS_GoT2D_dv1__T2D  T2D          0.1 
+   17_10902666_T_C  WGS_GoT2D_dv1__T2D  T2D          0.1 
+   17_10924652_C_T  WGS_GoT2D_dv1__T2D  T2D          0.1 
+   17_10947_C_T     WGS_GoT2D_dv1__T2D  T2D          0.1 
+   17_10967062_G_C  WGS_GoT2D_dv1__T2D  T2D     0.1      
+
 
 2.7 Upload SQL
 ~~~~~~~~~~~~~~
+
+  Final step is to upload files from previous step to db
+
+
+
+Footnotes
+_________
+
+[1] DEFINITION NOT FOUND.
