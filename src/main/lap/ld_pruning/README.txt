@@ -1,94 +1,139 @@
+				________
 
-This pipeline requires manual steps as it exists now.  This is a description of the steps and how to run.  
-There are notes on how to run the pipeline using the UGER cluster.  There are also some notes on how one could
-run this pipeline outside of UGER, though this would not be the ideal method.
+				 README
 
-LAP PIPELINE COMMANDS
-1. make_genomewide_input - plink command to extract common variants from phase3 1kg into a vcf file
-2. ld_get_variant_ids - this creates plink .bim files and .extract list for plink files generated in 1 using portal variant ids
-3. cmd_make_dataset_meta_file - creates a meta data file to create objects of class dataset for clumping and database upload
-4. ld_get_plink_annot_from_portal - for each dataset extract variants passing a pvalue significance threshold and write summary stats used in clump.
-5. ld_run_clump - runs clump on each chromosome,dataset and r2
-6. make_clump_exclude - parses output from step 5. to get all variants to exclude at a r2 value
-7. sql_loader*        - these commands create exclude .sql files for data updload at each r2 value.  eg. pointone finds all exclude uniqu to pointone only.
-                                                                                                         pointtwo find unique to pointtwo or pointone
-                                                                                                         etc.
-   sql_loader_pointone
-   sql_loader_pointtwo
-   sql_loader_pointfour
-   sql_loader_pointsix
-   sql_loader_pointeight
+				 tgreen
+				________
 
 
+Table of Contents
+_________________
 
-How to Run
-meta/ld_pruning_v18.meta is for common dv18
-
-Note:  some steps are run on only one r2 file so commands arent' repeated.
-1. perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd make_genomewide_input --only pointone
-2. perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd ld_get_variant_ids --only pointone (modify cluster usage parameters for MySQL*
-3. perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd cmd_make_dataset_meta_file
-4. perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd ld_get_plink_annot_from_portal --only pointone
-5. perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd run_clump --bsub
-6. perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd make_clump_exclude --bsub
-7. perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_loader_point --bsub ( this will run all sql_loader_point*)
-8. perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_upload_cmd --bsub *
-/* to limit the number of jobs running on db uncomment these lines.  This should be taken care of by bsub_batch option but I have not been 
-able to get this working so I using these configuration options on database access jobs.
-  key max_jobs 2 
-  key max_sge_batch 10
+1 Clumping
+2 Steps
+.. 2.1 Extract common variants (minor allele frequence > 5%) from 1000 Genomes
+.. 2.2 Create plink .bim and .extract files for all common variants
+.. 2.3 Create .annot file containing association statistice for the dataset being clumped
+.. 2.4 Run Clump
+.. 2.5 Make Exclude
+.. 2.6 Make Unique Exclude SQl
+.. 2.7 Upload SQL
 
 
-## due to the cluster being backlogged, this method enables parallizing the processes.  It uses a Unix pipeline to extract dataset objects from meta file and runs each dataset and r2 separately
-# To enable run clump to run on vm
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd run_clump --only pointone  --only {} --force-started
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd run_clump --only pointtwo  --only {} --force-started
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd run_clump --only pointfour  --only {} --force-started
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd run_clump --only pointsix  --only {} --force-started
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd run_clump --only pointeight  --only {} --force-started
-# To enable make exclude to run on vm
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd make_clump_exclude --only pointone --only {}
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd make_clump_exclude --only pointtwo --only {}
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd make_clump_exclude --only pointfour --only {}
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd make_clump_exclude --only pointsix --only {}
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd make_clump_exclude --only pointeight --only {}
-# To enable sql file generation to run on vm
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta  | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_loader_pointone --only pointone --only {}
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta  | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_loader_pointtwo --only pointtwo --only {}
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta  | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_loader_pointfour --only pointfour --only {}
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta  | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_loader_pointsix --only pointsix --only {}
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta  | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_loader_pointeight --only pointeight --only {}
-# To enable sql upload to run on vm
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta  | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_upload_cmd --only pointone --only {}
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta  | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_upload_cmd --only pointtwo --only {}
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta  | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_upload_cmd --only pointfour --only {}
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta  | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_upload_cmd --only pointsix --only {}
-grep class ../../ld_pruning/out/projects/ld_pruning.v18/ld_pruning.v18.dataset.meta  | awk '{print $1}' | xargs -i perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_upload_cmd --only pointeight --only {}
+1 Clumping
+==========
+
+  'Clumping' is grouping a set of variants because they are correlated
+  in genotype space and representing that clump of variants by the
+  variant with the lowest pvalue of association to a phenotype.  The
+  purpose of this pipeline is to create a list of variants that can be
+  excluded from viewing because they are represented by another variant
+  that has a lower association p-value to phenotype and have an r2 >
+  somethreshold.
+
+  The clumping algorithm requires a
+  1) reference genotype dataset (1000 Genomes) and
+  2) association statistics for the dataset being clumped.
 
 
-Misc testing calls
-----
-perl lap/trunk/bin/run.pl --meta projects/ld_pruning/ld_pruning.meta --debug --bsub
-# create vcf files for 1kg common variants
-# run only on one r2
-perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd make_genomewide_input --check --only pointone
-# takes a bim file and returns a bim file with portal ids and a snp extract list of variants in portal
-# run only on one r2
-# test on chrom22
-perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd ld_get_variant_ids --check --only pointone --only 22
-
-# makes annot file required for clumping
-# run only on one r2
-# test on chrom 22 & ExChip_300k_dv1__CHOL
-perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd ld_get_plink_annot_from_portal --only pointone --only 22 --only ExChip_300k_dv1__CHOL 
+  Reference for description of parameters and how clumping works
+  [http://zzz.bwh.harvard.edu/plink/clump.shtml]
 
 
-#run clump
-perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd run_clump --only pointtwo --only 22 --only ExChip_300k_dv1__CHOL 
+2 Steps
+=======
 
-#make exclude
-perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd make_clump_exclude  --only 22 --only ExChip_300k_dv1__CHOL
+  There are a few preprocessing steps to get the data in the correct
+  format for clumping.  The command plink --clump is used to clump the
+  data.  Once the data have there are a few steps to reformat the data
+  for upload into dataset.
 
-perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_loader_point* --only 22 --only ExChip_300k_dv1__CHOL
 
-perl ../../lap/trunk/bin/run.pl --meta meta/ld_pruning_v18.meta --only-cmd sql_upload_cmd --only 22 --only ExChip_300k_dv1__CHOL
+2.1 Extract common variants (minor allele frequence > 5%) from 1000 Genomes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  To create plink bed files for common variants of 1000 Genomes.  Rare
+  variants will not be included in exclude files.  plink_cmd
+  --vcf-half-call missing --maf 0.05 --make-bed --vcf <1000Genomes>
+  --out <chrm>
+
+
+2.2 Create plink .bim and .extract files for all common variants
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  From the .bim file for common variants run sql command to get variant
+  IDs in portal format.  The bim file will then be compatible with the
+  .annot file of association statistics for the clumping computation.
+
+  get_variant_ids.pl reads in .bim file from common variants created
+  above and creates 2 files
+
+  Output file 1 .bim file with portal IDs (chr_pos_ref_alt).  If there
+  is not a variant in portal the rs number is is used.
+
+   9  rs141734683    0  10362  C  CT 
+   9  9_10469_G_C    0  10469  G  C  
+   9  9_14690_C_G    0  14690  C  G  
+   9  rs71509923     0  14863  G  A  
+   9  9_14889_A_G    0  14889  G  A  
+   9  9_15883_A_G    0  15883  G  A  
+   9  .              0  16934  A  G  
+   9  rs202245356    0  16967  G  A  
+   9  rs78210423     0  17107  C  T  
+   9  9_17115_G_C,T  0  17115  C  G  
+
+
+  Output file 2 .extract file containing only variants that are in the
+  portal.  This file is used to limit the variants used in clumping to
+  those in the portal.
+
+   9_10469_G_C   
+   9_14690_C_G   
+   9_14889_A_G   
+   9_15883_A_G   
+   9_17115_G_C,T 
+   9_39037_A_C   
+   9_39516_C_T   
+   9_40178_A_G   
+   9_40910_T_G   
+   9_40997_A_T   
+
+
+2.3 Create .annot file containing association statistice for the dataset being clumped
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  get_plink_annot_from_portal.pl
+
+   CHROM  SNP                 BP  A1    F_A  F_U  A2  CHISQ          P                  BETA 
+  -------------------------------------------------------------------------------------------
+       1  1_30967_CCCA_C   30966  CCCA    0    0  -       0   0.089331   -0.5557899999999999 
+       1  1_66596_AT_A     66595  AT      0    0  -       0    0.02244    0.5943000000000004 
+       1  1_147591_G_GA   147591  G       0    0  A       0  0.0072203              -0.87507 
+       1  1_413994_CA_C   413993  CA      0    0  -       0   0.097916   -0.5185199999999998 
+       1  1_653062_TA_T   653061  TA      0    0  -       0   0.088741    0.3804700000000016 
+       1  1_682462_AG_A   682461  AG      0    0  -       0   0.043422    0.4764399999999992 
+       1  1_693731_A_G    693731  A       0    0  G       0  0.0071156  -0.22431000000000054 
+       1  1_729632_C_T    729632  C       0    0  T       0   0.085771              -0.77467 
+       1  1_729679_C_G    729679  C       0    0  G       0   0.038137    0.1532400000000013 
+
+
+2.4 Run Clump
+~~~~~~~~~~~~~
+
+  Here is the clump command short cmd ld_run_clump=plink\ --clump-p1 0.1
+  \ -clump-p2 0.1 \ -clump-r2 [.1,.2,.4,.6,.8] \ --allow-no-sex \
+  --noweb \ --bed,phase3_1kg_common_bed --bim,portal_bim
+  --fam,phase3_1kg_common_fam --clump portal_association_annot
+  --extract,portal_snp_extract --chr <chr> --out
+
+
+2.5 Make Exclude
+~~~~~~~~~~~~~~~~
+
+
+2.6 Make Unique Exclude SQl
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+2.7 Upload SQL
+~~~~~~~~~~~~~~
