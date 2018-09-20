@@ -12,11 +12,11 @@ _________________
 1 Clumping
 2 Steps
 .. 2.1 Extract common variants (minor allele frequence > 5%) from 1000 Genomes
-.. 2.2 Create plink .bim and .extract files for all common variants
+.. 2.2 Create  plink .bim and .extract files for all common variants using portal-based IDs
 .. 2.3 Create .annot file containing association statistice for the dataset being clumped
 .. 2.4 Run Clump
 .. 2.5 Make Exclude
-.. 2.6 Make Unique Exclude SQl
+.. 2.6 Make Unique Exclude SQL
 .. 2.7 Upload SQL
 
 
@@ -32,7 +32,8 @@ _________________
   somethreshold.
 
   The clumping algorithm requires a
-  1) reference genotype dataset (1000 Genomes) and
+  1) reference genotype dataset (1000 Genomes) for linkage
+     disequilibrium(LD) statistics
   2) association statistics for the dataset being clumped.
 
 
@@ -43,30 +44,48 @@ _________________
 2 Steps
 =======
 
-  There are a few preprocessing steps to get the data in the correct
-  format for clumping.  The command plink --clump is used to clump the
-  data.  Once the data have there are a few steps to reformat the data
-  for upload into dataset.
+  There are a few pre-processing steps to get the data in the correct
+  format for clumping.  Once the data is corrected formatted the command
+  plink --clump (with options) is used to clump the data.  After the
+  data has been clumped there are a few steps to parse and reformat the
+  data for upload.
 
 
 2.1 Extract common variants (minor allele frequence > 5%) from 1000 Genomes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  To create plink bed files for common variants of 1000 Genomes.  Rare
-  variants will not be included in exclude files.  plink_cmd
-  --vcf-half-call missing --maf 0.05 --make-bed --vcf <1000Genomes>
+  PLINK binary filessets consist of 3 files .bed,.bim,and .fam.  .bed
+  files have the genotypes,.bim files have the markers and .fam files
+  have the sample information.
+
+  To create plink .bed,.bim,.fam files for common variants of 1000
+  Genomes the command is
+
+  plink --vcf-half-call missing
+
+  --maf 0.05
+
+  --make-bed
+
+  --vcf <1000Genomes>
+
   --out <chrm>
 
 
-2.2 Create plink .bim and .extract files for all common variants
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  From the .bim file for common variants run sql command to get variant
-  IDs in portal format.  The bim file will then be compatible with the
-  .annot file of association statistics for the clumping computation.
+  Rare variants will not be included in exclude files.
 
-  get_variant_ids.pl reads in .bim file from common variants created
-  above and creates 2 files
+
+2.2 Create  plink .bim and .extract files for all common variants using portal-based IDs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  From the .bim file for common variants run a series of SQL commands to
+  get corresponding variant IDs in portal format.  The portal .bim file
+  will then be compatible with the .annot file of association statistics
+  for the clumping computation.
+
+  get_variant_ids.pl reads in .bim file from common variants plink
+  binary fileset created above and creates 2 new files
 
   Output file 1 .bim file with portal IDs (chr_pos_ref_alt).  If there
   is not a variant in portal the rs number is is used.
@@ -102,26 +121,13 @@ _________________
 2.3 Create .annot file containing association statistice for the dataset being clumped
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  Script: get_plink_annot_from_portal.pl
-
-  usage perl -I$dig_jenkins_lib get_plink_annot_from_portal.pl
-
-  --dbi-configuration <dbi_configuration>
-
-  --common-table mysql_common_table
-
-  --pvalue-threshold <pvalue_threshold>
-
-  --out <portal_association_annot>
-
-  --chr <chromosome>
-
-  --dataset-table <dataset_table>
-
-
-
   For clumping, plink needs the association statistics for each dataset
   and chromosome for each dataset
+
+
+  script get_plink_annot_from_portal.pl
+
+  produces
 
 
    CHROM  SNP                 BP  A1    F_A  F_U  A2  CHISQ          P                  BETA 
@@ -140,11 +146,29 @@ _________________
 2.4 Run Clump
 ~~~~~~~~~~~~~
 
-  Here is the clump command short cmd ld_run_clump=plink --clump-p1 0.1
-  -clump-p2 0.1 -clump-r2 [.1,.2,.4,.6,.8] --allow-no-sex --noweb
-  --bed,phase3_1kg_common_bed --bim,portal_bim
-  --fam,phase3_1kg_common_fam --clump portal_association_annot
-  --extract,portal_snp_extract --chr <chr> --out
+  plink --clump-p1 0.1
+
+  -clump-p2 0.1
+
+  -clump-r2 [.1,.2,.4,.6,.8]
+
+  --allow-no-sex
+
+  --noweb
+
+  --bed phase3_1kg_common_bed
+
+  --bim portal_bim
+
+  --fam phase3_1kg_common_fam
+
+  --clump portal_association_annot
+
+  --extract,portal_snp_extract
+
+  --chr p<chr>
+
+  --out
 
 
    CHR  F  SNP                    BP         P  TOTAL  NSIG  S05  S01  S001  S0001  SP2                                       
@@ -162,8 +186,16 @@ _________________
 
   This step takes the last column of the previous step and creates list
   of variants that can be excluede at each r2 level perl -lane 'my
-  \$this= \$F[1];my @a=split(",",\$this); map {s/\(.+\)//g;} @a;foreach
-  \$a (@a) {print \$a if length(\$a)>5}' clump_file > clump_exclude
+  \$this= \$F[1];
+
+  my @a=split(",",\$this);
+
+  map {s/\(.+\)//g;} @a;
+
+  foreach \$a (@a)
+
+  {print \$a if length(\$a)>5}' clump_file > clump_exclude
+
 
    17_79413436_T_C 
    17_79413475_C_A 
@@ -175,7 +207,7 @@ _________________
    17_79418260_A_G 
 
 
-2.6 Make Unique Exclude SQl
+2.6 Make Unique Exclude SQL
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   Next step is to make succesive unique exclude lists into sql format
@@ -184,16 +216,16 @@ _________________
   list.8 | sort | uniq > uniq.q
 
 
-   17_10023426_C_T  WGS_GoT2D_dv1__T2D  T2D          0.1 
-   17_102384_T_A    WGS_GoT2D_dv1__T2D  T2D          0.1 
-   17_10393249_G_T  WGS_GoT2D_dv1__T2D  T2D          0.1 
-   17_10522041_G_T  WGS_GoT2D_dv1__T2D  T2D          0.1 
-   17_10524747_A_G  WGS_GoT2D_dv1__T2D  T2D          0.1 
-   17_10711174_C_A  WGS_GoT2D_dv1__T2D  T2D          0.1 
-   17_10902666_T_C  WGS_GoT2D_dv1__T2D  T2D          0.1 
-   17_10924652_C_T  WGS_GoT2D_dv1__T2D  T2D          0.1 
-   17_10947_C_T     WGS_GoT2D_dv1__T2D  T2D          0.1 
-   17_10967062_G_C  WGS_GoT2D_dv1__T2D  T2D     0.1      
+   17_10023426_C_T  WGS_GoT2D_dv1__T2D  T2D  0.1 
+   17_102384_T_A    WGS_GoT2D_dv1__T2D  T2D  0.1 
+   17_10393249_G_T  WGS_GoT2D_dv1__T2D  T2D  0.1 
+   17_10522041_G_T  WGS_GoT2D_dv1__T2D  T2D  0.1 
+   17_10524747_A_G  WGS_GoT2D_dv1__T2D  T2D  0.1 
+   17_10711174_C_A  WGS_GoT2D_dv1__T2D  T2D  0.1 
+   17_10902666_T_C  WGS_GoT2D_dv1__T2D  T2D  0.1 
+   17_10924652_C_T  WGS_GoT2D_dv1__T2D  T2D  0.1 
+   17_10947_C_T     WGS_GoT2D_dv1__T2D  T2D  0.1 
+   17_10967062_G_C  WGS_GoT2D_dv1__T2D  T2D  0.1 
 
 
 2.7 Upload SQL
