@@ -30,7 +30,7 @@ _________________
 =============
 
   Pipeline to get cell-type specific LD score regression statistics.
-  There are several parts of this pipeline each with multiple steps.
+  
 
   Software can be downloaded from
 
