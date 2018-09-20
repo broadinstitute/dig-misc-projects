@@ -11,18 +11,18 @@ _________________
 
 1 Description
 2 Munge stats
+.. 2.1 sumstats_in
+.. 2.2 snp_list
+.. 2.3 munge_results
 3 LDscore regression
-.. 3.1 Command
-.. 3.2 Reformatting Description
-.. 3.3 File types:
-..... 3.3.1 File 1.  .annot.gz* reformat
-..... 3.3.2 File 2. baseline.1.l2.M*
-..... 3.3.3 File 3. baseline.1.l2.M_5_50*
-..... 3.3.4 File 4.  ldscore.gz*
-.. 3.4 Model Components
-..... 3.4.1 baseline.
-..... 3.4.2 cell type specific
-.. 3.5 Run
+.. 3.1 Reformatting Description
+.. 3.2 File types:
+..... 3.2.1 File 1.  .annot.gz* reformat
+..... 3.2.2 File 2. baseline.1.l2.M*
+..... 3.2.3 File 3. baseline.1.l2.M_5_50*
+..... 3.2.4 File 4. ldscore.gz*
+.. 3.3 Command
+.. 3.4 Run
 4 Load
 
 
@@ -45,10 +45,20 @@ _________________
 =============
 
   python /humgen/diabetes/users/tgreen/software/ldsc/munge_sumstats.py
-  --sumstats <sumstats_in> --merge-alleles <snp_list> --out
-  <munge_result>
 
-  The data input for these steps is from the portal mysql_db sumstats_in
+  --sumstats <sumstats_in>
+
+  --merge-alleles <snp_list>
+
+  --out <munge_result>
+
+  The data input for these steps is from the portal mysql_db
+
+
+2.1 sumstats_in
+~~~~~~~~~~~~~~~
+
+  These need to be create per dataset/phenotype
 
         SNP  CHR     POS  A1  A2  REF     EAF                 Beta      se       P       N  INFO 
   -----------------------------------------------------------------------------------------------
@@ -64,7 +74,12 @@ _________________
 
   EAF is effective allele frequency from 1kg table
 
-  snp_list
+
+2.2 snp_list
+~~~~~~~~~~~~
+
+  corresponds to sumstats in
+
         SNP  A1  A2 
   ------------------
     1:88236  C   T  
@@ -78,7 +93,11 @@ _________________
    1:708075  A   G  
 
 
-  output munge_results
+2.3 munge_results
+~~~~~~~~~~~~~~~~~
+
+  output of munge_stats and input into ldscore regression
+
         SNP  A1  A2       Z           N 
     1:88236                             
     1:99719                             
@@ -94,23 +113,7 @@ _________________
 3 LDscore regression
 ====================
 
-3.1 Command
-~~~~~~~~~~~
-
-  python ldscore
-
-  --h2-cts sumstats
-
-  --ref-ld-chr <baseline.>
-
-  --out <munge_result>
-
-  --ref-ld-chr-cts GTEx.ldcts
-
-  --w-ld-chr <weights.>
-
-
-3.2 Reformatting Description
+3.1 Reformatting Description
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Because the public datasets use rs Ids and the portal uses chrom pos
@@ -129,10 +132,10 @@ _________________
   '*ld_score.gz (reformat)
 
 
-3.3 File types:
+3.2 File types:
 ~~~~~~~~~~~~~~~
 
-3.3.1 File 1.  .annot.gz* reformat
+3.2.1 File 1.  .annot.gz* reformat
 ----------------------------------
 
    CHR     BP  SNP           CM  base  Coding_UCSC.bed  Coding_UCSC.extend.500.bed  Conserved_LindbladToh.bed  etc           
@@ -142,26 +145,26 @@ _________________
 
   converted to
 
-   CHR       BP  SNP           CM  base  Coding_UCSC.bed  Coding_UCSC.extend.500.bed  Conserved_LindbladToh.bed  etc 
-     1  1:11008  rs575272151  0.0     1                0                           0                          0    0 
-     1  1:11012  rs544419019  0.0     1                0                           0                          0    0 
-     1  1:13110  rs540538026  0.0     1                0                           0                          0    0 
+   CHR     BP      SNP   CM  base  Coding_UCSC.bed  Coding_UCSC.extend.500.bed  Conserved_LindbladToh.bed  etc 
+     1  11008  1:11008  0.0     1                0                           0                          0    0 
+     1  11012  1:11012  0.0     1                0                           0                          0    0 
+     1  13110  1:13110  0.0     1                0                           0                          0    0 
 
 
-3.3.2 File 2. baseline.1.l2.M*
+3.2.2 File 2. baseline.1.l2.M*
 ------------------------------
 
   copy file
 
 
-3.3.3 File 3. baseline.1.l2.M_5_50*
+3.2.3 File 3. baseline.1.l2.M_5_50*
 -----------------------------------
 
   copy file
 
 
-3.3.4 File 4.  ldscore.gz*
---------------------------
+3.2.4 File 4. ldscore.gz*
+-------------------------
 
   convert
    CHR  SNP             BP  All_Genes 
@@ -187,48 +190,28 @@ _________________
      8  8:187639  187639     96.520 
 
 
-3.4 Model Components
-~~~~~~~~~~~~~~~~~~~~
+3.3 Command
+~~~~~~~~~~~
 
-  Each of the model compenents will have the 4 file types by chromosome
-  and tissue
+  python ldscore
 
+  --h2-cts [ output from munge stats]
 
-3.4.1 baseline.
----------------
+  --ref-ld-chr <baseline.> [ 1000G_Phase3_baseline_ldscores.tgz ]
 
-  --ref-ld-chr Data downloaded from web
-  ----------------------------------------------------------------------
-  /humgen/diabetes/users/tgreen/ldscore/out/projects/experiment1/1000G_EUR_Phase3_baseline/
+  --out output
 
+  --ref-ld-chr-cts GTEx.ldcts [
+    Multi_tissue_gene_expr_1000Gv3_ldscores.tgz in S3 dig-ldscore]
 
-3.4.2 cell type specific
-------------------------
-
-    --ref-ld-chr-cts
-  /humgen/diabetes/users/tgreen/ldscore/out/projects/project1/GTEx.ldcts
-  ( which points to data here This file points to groups of files per
-  tissue.  For example GTEx.1. and GTEx.control. from line 1 will have 8
-  (4+4)files to reformat or copy.  The example lists 10 tissues.  There
-  are 53 tissues in the GTex dataset.
-
-   Adipose_Subcutaneous                    GTEx.1.,GTEx.control.  
-   Adipose_Visceral_(Omentum)              GTEx.2.,GTEx.control.  
-   Adrenal_Gland                           GTEx.3.,GTEx.control.  
-   Artery_Aorta                            GTEx.4.,GTEx.control.  
-   Artery_Coronary                         GTEx.5.,GTEx.control.  
-   Artery_Tibial                           GTEx.6.,GTEx.control.  
-   Bladder                                 GTEx.7.,GTEx.control.  
-   Brain_Amygdala                          GTEx.8.,GTEx.control.  
-   Brain_Anterior_cingulate_cortex_(BA24)  GTEx.9.,GTEx.control.  
-   Brain_Caudate_(basal_ganglia)           GTEx.10.,GTEx.control. 
-
-  In each of this groups all the file types need to be converted or
-  copied.
+  --w-ld-chr <weights.> [ weights_hm3_no_hla.tgz in S3 dig-ldscore]
 
 
-3.5 Run
+3.4 Run
 ~~~~~~~
+
+  Run munge stats then ldscore regression on dataset from each phenotype
+  that has the most samples.
 
 
 4 Load
