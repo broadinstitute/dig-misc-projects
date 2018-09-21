@@ -222,8 +222,7 @@ _________________
 4 Load
 ======
 
-  The output from LD score regression is .cell_type_results.txt For,
-  example
+  The output from LD score regression is .cell_type_results.txt For example
 
    Name                                     Coefficient  Coefficient_std_error  Coefficient_P_value 
    Cervix_Endocervix                  5.94314247987e-08      2.67185268672e-08      0.0130623650369 
