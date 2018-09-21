@@ -30,11 +30,7 @@ _________________
 =============
 
   Pipeline to get cell-type specific LD score regression statistics.
-<<<<<<< HEAD
   with multiple steps.
-=======
-  
->>>>>>> 202ce523461fb67389d0b295c6cc76785bde7fbc
 
   Software can be downloaded from
 
@@ -135,7 +131,8 @@ _________________
 
   '*1.l2.M_5_50 (copy)
 
-  '*ld_score.gz (reformat)
+  '*ld_score.gz (reformat in 1000G_Phase3_baseline_ldscores.tgz, copy in
+  Multi_tissue_gene_expr_1000Gv3_ldscores.tgz)
 
 
 3.2 File types:
@@ -143,6 +140,8 @@ _________________
 
 3.2.1 File 1.  .annot.gz* reformat
 ----------------------------------
+
+  if reformating for 1000G_Phase3_baseline_ldscores.tgz otherwise copy
 
    CHR     BP  SNP           CM  base  Coding_UCSC.bed  Coding_UCSC.extend.500.bed  Conserved_LindbladToh.bed  etc           
      1  11008  rs575272151  0.0     1                0                           0                          0    0           
@@ -222,3 +221,24 @@ _________________
 
 4 Load
 ======
+
+  The output from LD score regression is .cell_type_results.txt For,
+  example
+
+   Name                                     Coefficient  Coefficient_std_error  Coefficient_P_value 
+   Cervix_Endocervix                  5.94314247987e-08      2.67185268672e-08      0.0130623650369 
+   Ovary                              5.59184672159e-08       2.5694901906e-08       0.014768377719 
+   Pancreas                           5.27896455174e-08      2.75796265738e-08      0.0278048888108 
+   Cells_EBV-transformed_lymphocytes   4.4279951454e-08        2.427585219e-08      0.0340735543031 
+   Uterus                             4.99547354379e-08      2.97443340682e-08      0.0465301792091 
+   Liver                              4.72685014049e-08      3.04224346555e-08      0.0601234286061 
+   Kidney_Cortex                       4.4196990345e-08      2.90816953203e-08      0.0642865473491 
+   Cervix_Ectocervix                  3.84330319794e-08      2.56225768373e-08       0.066811413437 
+   Whole_Blood                        4.71459572675e-08      3.16928951163e-08      0.0684298449304 
+
+  insert into ld_score(phenotype,tissue,weight,coef,se,p_value)"; |
+  values(<PHENOTYPE>,<TISSUE_NAME>,<WEIGHT>,<COEF>,<SE>,<PVALUE>)
+
+  PHENOTYPE=phenotype of dataset TISSUE=Tissue name
+  WEIGHT=-log10(Coefficient_P_value) COEF=Coefficient
+  SE=Coefficient_std_error PVALUE=Coefficient_P_value
