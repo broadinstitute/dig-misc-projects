@@ -30,7 +30,11 @@ _________________
 =============
 
   Pipeline to get cell-type specific LD score regression statistics.
+<<<<<<< HEAD
   with multiple steps.
+=======
+  
+>>>>>>> 202ce523461fb67389d0b295c6cc76785bde7fbc
 
   Software can be downloaded from
 
