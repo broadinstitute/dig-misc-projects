@@ -228,10 +228,21 @@ _________________
 4.1 SQL
 ~~~~~~~
 
-  CREATE TABLE `ld_score` ( `phenotype` varchar(100) DEFAULT NULL,
-    `tissue` varchar(100) DEFAULT NULL, `weight` float DEFAULT NULL,
-    `coef` float DEFAULT NULL, `se` float DEFAULT NULL, `p_value` float
-    DEFAULT NULL )
+  CREATE TABLE `ld_score` (
+
+  `phenotype` varchar(100) DEFAULT NULL,
+
+  `tissue` varchar(100) DEFAULT NULL,
+
+  `weight` float DEFAULT NULL,
+
+  `coef` float DEFAULT NULL,
+
+  `se` float DEFAULT NULL,
+
+  `p_value` float DEFAULT NULL
+
+  )
 
 
 4.2 Upload
