@@ -23,7 +23,10 @@ _________________
 ..... 3.2.4 File 4. ldscore.gz*
 .. 3.3 Command
 .. 3.4 Run
-4 Load
+4 Database
+.. 4.1 SQL
+.. 4.2 Upload
+.. 4.3 Example
 
 
 1 Description
@@ -219,10 +222,23 @@ _________________
   that has the most samples.
 
 
-4 Load
-======
+4 Database
+==========
 
-  The output from LD score regression is .cell_type_results.txt For example
+4.1 SQL
+~~~~~~~
+
+  CREATE TABLE `ld_score` ( `phenotype` varchar(100) DEFAULT NULL,
+    `tissue` varchar(100) DEFAULT NULL, `weight` float DEFAULT NULL,
+    `coef` float DEFAULT NULL, `se` float DEFAULT NULL, `p_value` float
+    DEFAULT NULL )
+
+
+4.2 Upload
+~~~~~~~~~~
+
+  The output from LD score regression is .cell_type_results.txt For
+  example ,
 
    Name                                     Coefficient  Coefficient_std_error  Coefficient_P_value 
    Cervix_Endocervix                  5.94314247987e-08      2.67185268672e-08      0.0130623650369 
@@ -241,3 +257,23 @@ _________________
   PHENOTYPE=phenotype of dataset TISSUE=Tissue name
   WEIGHT=-log10(Coefficient_P_value) COEF=Coefficient
   SE=Coefficient_std_error PVALUE=Coefficient_P_value
+
+
+4.3 Example
+~~~~~~~~~~~
+
+   AF  Heart_Left_Ventricle                  1.91524   0.0000000170759  0.00000000758189  0.0121552 
+   AF  Bladder                               1.76446   0.0000000118582   0.0000000056058  0.0172006 
+   AF  Heart_Atrial_Appendage                1.74635   0.0000000150503  0.00000000717214  0.0179329 
+   AF  Uterus                                1.71173   0.0000000132259  0.00000000640215  0.0194209 
+   AF  Muscle_Skeletal                       1.49305   0.0000000141985   0.0000000076735  0.0321326 
+   AF  Cervix_Ectocervix                     1.46427   0.0000000110969  0.00000000609524  0.0343345 
+   AF  Artery_Tibial                         1.45575   0.0000000108925  0.00000000601226  0.0350145 
+   AF  Adrenal_Gland                         1.16921   0.0000000104146  0.00000000697609  0.0677312 
+   AF  Fallopian_Tube                        1.05728  0.00000000948824  0.00000000700029   0.087644 
+   AF  Testis                               0.958101  0.00000000782905  0.00000000638665   0.110128 
+   AF  Esophagus_Gastroesophageal_Junction  0.903767  0.00000000742438  0.00000000644872   0.124805 
+   AF  Artery_Coronary                      0.817443  0.00000000700932  0.00000000682617    0.15225 
+   AF  Colon_Sigmoid                        0.744563  0.00000000621786  0.00000000679469   0.180068 
+   AF  Esophagus_Muscularis                 0.677229  0.00000000519015  0.00000000644343   0.210267 
+   AF  Breast_Mammary_Tissue                0.640766  0.00000000470357   0.0000000063289   0.228683 
