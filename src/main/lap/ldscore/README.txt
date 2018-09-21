@@ -264,9 +264,12 @@ _________________
   insert into ld_score(phenotype,tissue,weight,coef,se,p_value)"; |
   values(<PHENOTYPE>,<TISSUE_NAME>,<WEIGHT>,<COEF>,<SE>,<PVALUE>)
 
-  PHENOTYPE=phenotype of dataset TISSUE=Tissue name
-  WEIGHT=-log10(Coefficient_P_value) COEF=Coefficient
-  SE=Coefficient_std_error PVALUE=Coefficient_P_value
+  PHENOTYPE=phenotype of dataset 
+  TISSUE=Tissue name
+  WEIGHT=-log10(Coefficient_P_value) 
+  COEF=Coefficient
+  SE=Coefficient_std_error 
+  PVALUE=Coefficient_P_value
 
 
 4.3 Example
