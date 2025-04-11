@@ -29,6 +29,8 @@ PHRASES = [
 @app.get("/")
 async def health_check():
     """Health check endpoint"""
+    logger.info(f"=============== Received query for health_check")
+
     return {"status": "ok", "message": "Test MCP Server is running"}
 
 @app.post("/mcp/{path:path}")
@@ -69,6 +71,8 @@ async def list_models():
     """
     Endpoint to list available models (often used in API discovery)
     """
+    logger.info(f"=============== Received query for MODELS")
+
     return {
         "object": "list",
         "data": [
