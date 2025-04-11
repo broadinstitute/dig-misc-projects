@@ -85,5 +85,5 @@ if __name__ == "__main__":
     # For local development
     # src/main/python/GenAI/MCP/testSimpleTranslatorMcpServer.py
     # uvicorn.run("test_mcp_server:app", host="0.0.0.0", port=8000, reload=True)
-    uvicorn.run("testSimpleTranslatorMcpServer:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("testSimpleTranslatorMcpServer:app", host="0.0.0.0", port=8081, reload=True)
 
