@@ -18,8 +18,8 @@ app = FastAPI(
 
 # Hard-coded phrases to return
 PHRASES = [
-    "Levonorgestrel, a reproductive drug similar to Ethinylestradiol, potentially treats Ehlers-Danlos syndrome"
-    "Ethinylestradiol, a receptor modulator, potentially treats Ehlers-Danlos syndrome"
+    "Levonorgestrel, a reproductive drug similar to Ethinylestradiol, potentially treats Ehlers-Danlos syndrome",
+    "Ethinylestradiol, a receptor modulator, potentially treats Ehlers-Danlos syndrome",
     """Midazolam, with properties Neurotransmitter Agent, Central Nervous System Drug, Apoptosis Inducer, Antineoplastic Agent, 
     Neuromuscular Agent, Anaesthetic and decreases the metabolic processing of genes ABCB6 and CYP3A4 
     which in turn decreases melatonin might treat Ehlers-Danlos syndrome
