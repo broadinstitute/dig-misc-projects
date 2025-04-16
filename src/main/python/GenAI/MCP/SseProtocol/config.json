@@ -1,0 +1,7 @@
+{
+    "mcpServers": {
+        "bioindex": {
+            "url": "http://ec2-aws.compute-1.amazonaws.com:8081/sse"
+        }
+    }
+}
