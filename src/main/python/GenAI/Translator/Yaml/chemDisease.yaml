@@ -1,0 +1,69 @@
+openapi: 3.0.1
+info:
+  title: Compound-Disease Association API
+  version: "1.0.0"
+  description: |
+    Returns an association between a chemical compound and a disease,
+    including subject/object identifiers, relationship type, and supporting PubMed references.
+servers:
+  - url: https://example.org/api
+paths:
+  /association:
+    get:
+      summary: Get compound-disease association
+      description: Retrieve an association between a compound and a disease including evidence.
+      operationId: getAssociation
+      responses:
+        '200':
+          description: Successful response with association data
+          content:
+            application/json:
+              schema:
+                type: object
+                description: A single compound-disease association with evidence
+                properties:
+                  subject:
+                    type: object
+                    description: The chemical compound involved in the association
+                    properties:
+                      id:
+                        type: string
+                        description: CURIE identifier of the compound (e.g., ChEMBL)
+                        example: "CHEMBL.COMPOUND:CHEMBL17"
+                      name:
+                        type: string
+                        description: Name of the compound
+                        example: "dichlorphenamide"
+                  object:
+                    type: object
+                    description: The disease or condition associated with the compound
+                    properties:
+                      id:
+                        type: string
+                        description: CURIE identifier of the disease (e.g., MONDO)
+                        example: "MONDO:0005359"
+                      name:
+                        type: string
+                        description: Name of the disease
+                        example: "drug-induced liver injury"
+                  relationship:
+                    type: string
+                    description: Predicate indicating the relationship type from Biolink model
+                    example: "biolink:associated_with"
+                  pubmed_ids:
+                    type: array
+                    description: List of PubMed IDs supporting this association
+                    items:
+                      type: string
+                      description: A PubMed identifier
+                      example: "PMID:14971821"
+tags:
+  - name: Association
+    description: Compound-disease relationships
+
+x-translator:
+  component: KP
+  team:
+    - Service Provider Name
+  biolink-version: "3.0.0"
+  infores: "infores:example-api"
