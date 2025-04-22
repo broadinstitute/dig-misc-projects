@@ -6,16 +6,16 @@ info:
     Returns an association between a chemical compound and a disease,
     including subject/object identifiers, relationship type, and supporting PubMed references.
 servers:
-  - url: https://example.org/api
+  - url: https://example.org/get_drug_for_disease
 paths:
   /association:
     get:
       summary: Get compound-disease association
       description: Retrieve an association between a compound and a disease including evidence.
-      operationId: getAssociation
+      operationId: get_drug_for_disease
       responses:
         '200':
-          description: Successful response with association data
+          description: Successful response with drug to disease association data including pubmed id evidence
           content:
             application/json:
               schema:
@@ -59,7 +59,7 @@ paths:
                       example: "PMID:14971821"
 tags:
   - name: Association
-    description: Compound-disease relationships
+    description: Association between a compound and a disease including evidence.
 
 x-translator:
   component: KP

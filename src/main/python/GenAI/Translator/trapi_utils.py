@@ -6,14 +6,13 @@ import constants_utils as cutils
 
 
 # constants
-URL_MOLEPRO = "https://translator.broadinstitute.org/molepro/trapi/v1.5"
 URL_TRANSLATOR_QUERY = "{}/query"
 
 URL_NAME_RESOLVER ="https://name-lookup.transltr.io/lookup?limit={}&string={}"
 
 
 # methods
-def query_trapi_rest_service(endpoint_url, list_source, list_predicates=["biolink:related_to"], list_source_types=[], list_target_types=[], log=False):
+def query_trapi_rest_service(endpoint_url, list_target, list_predicates=["biolink:related_to"], list_source_types=[], list_target_types=[], log=False):
     """
     Sends a POST request to a REST service with the given list of source IDs.
 
@@ -29,10 +28,10 @@ def query_trapi_rest_service(endpoint_url, list_source, list_predicates=["biolin
             "query_graph": {
                 "nodes": {
                     "source": {
-                        "ids": list_source,
                         "categories": list_source_types
                     },
                     "target": {
+                        "ids": list_target,
                         "categories": list_target_types
                     }
                 },
@@ -116,8 +115,8 @@ def query_trapi_for_string(endpoint_url, entity_name, list_ontologies, list_pred
             print("querying endpoint: {}".format(endpoint_url))
 
         # do the trapi query
-        map_trapi_response = query_trapi_rest_service(endpoint_url=endpoint_url, list_source=list_curies, list_predicates=list_predicates, 
-                                                    list_source_types=list_source_types, list_target_types=list_target_types)
+        map_trapi_response = query_trapi_rest_service(endpoint_url=endpoint_url, list_target=list_curies, list_predicates=list_predicates, 
+                                                    list_source_types=list_source_types, list_target_types=list_target_types, log=log)
         
         # log
         if log:
@@ -174,6 +173,7 @@ if __name__ == "__main__":
     list_disease_types = ["biolink:Disease"]
     entity_name = "type 2 diabetes"
     list_ontologies = ['MONDO']
+    list_t2d_id = ["MONDO:0005148"]
 
     # # test method
     # map_trapi_result = query_trapi_rest_service(endpoint_url=URL_MOLEPRO, list_source=id_source, list_source_types=list_source_types, list_target_types=list_target_types, log=True)
@@ -185,6 +185,6 @@ if __name__ == "__main__":
     list_ids = get_curies(entity_name=entity_name, list_ontologies=list_ontologies, log=True)
 
     # test end to end query
-    map_result = query_trapi_for_string(endpoint_url=URL_MOLEPRO, entity_name=entity_name, list_ontologies=list_ontologies, 
-                                        list_source_types=list_disease_types, list_target_types=list_chem_types, log=True)
+    map_result = query_trapi_for_string(endpoint_url=cutils.URL_MOLEPRO, entity_name=entity_name, list_ontologies=list_ontologies, 
+                                        list_source_types=list_chem_types, list_target_types=list_disease_types, log=True)
     print("got result: \n{}".format(json.dumps(map_result, indent=2)))

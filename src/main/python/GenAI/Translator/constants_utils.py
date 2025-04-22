@@ -18,4 +18,19 @@ KEY_RELATIONSHIP = "relationship"
 KEY_RELATIONSHIP_PROPS = "relationship_properties"
 
 
+# URLS
+URL_MOLEPRO = "https://translator.broadinstitute.org/molepro/trapi/v1.5"
+
+
+# LISTS
+LIST_ONTOLOGIES_DISEASE = ["MONDO"]
+LIST_ONTOLOGIES_GENE = ["NCBIGene"]
+LIST_ONTOLOGIES_CHEM = ["MONDO"]
+
+LIST_PREDICATES_TREATS = ["biolink:treats"]
+
+LIST_ENTITIES_GENE = ["biolink:Gene"]
+LIST_ENTITIES_DISEASE = ["biolink:Disease"]
+LIST_ENTITIES_DRUG = ["biolink:SmallMolecule"]
+
 
