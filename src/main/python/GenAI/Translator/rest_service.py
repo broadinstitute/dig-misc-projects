@@ -7,7 +7,8 @@ import constants_utils as cutils
 from trapi_utils import query_trapi_for_string
 
 # constants
-app = FastAPI()
+# app = FastAPI()
+app = FastAPI(root_path="/")
 
 # methods
 @app.get("/get_drug_for_disease")
