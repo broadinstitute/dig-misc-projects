@@ -11,7 +11,7 @@ app = FastAPI()
 
 # methods
 @app.get("/get_drug_for_disease")
-def reverse_string(input: str = Query(..., description="String to reverse")):
+def reverse_string(input: str = Query(..., description="disease")):
     # call the method
     # reversed_str = input[::-1]
     print("got input: {}".format(input))
@@ -24,7 +24,7 @@ def reverse_string(input: str = Query(..., description="String to reverse")):
 
 
 @app.get("/get_gene_for_disease")
-def reverse_string(input: str = Query(..., description="String to reverse")):
+def reverse_string(input: str = Query(..., description="disease")):
     # call the method
     # reversed_str = input[::-1]
     print("got input: {}".format(input))
@@ -35,6 +35,18 @@ def reverse_string(input: str = Query(..., description="String to reverse")):
     # return JSONResponse(content={"original": input, "reversed": reversed_str})
     return JSONResponse(content={'result': list_result})
 
+
+@app.get("/get_drug_for_gene")
+def reverse_string(input: str = Query(..., description="gene")):
+    # call the method
+    # reversed_str = input[::-1]
+    print("got input: {}".format(input))
+    list_result = query_trapi_for_string(endpoint_url=cutils.URL_MOLEPRO, entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_GENE,
+                                         list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_DRUG, 
+                                         list_target_types=cutils.LIST_ENTITIES_GENE, log=True)    
+    # return
+    # return JSONResponse(content={"original": input, "reversed": reversed_str})
+    return JSONResponse(content={'result': list_result})
 
 
 

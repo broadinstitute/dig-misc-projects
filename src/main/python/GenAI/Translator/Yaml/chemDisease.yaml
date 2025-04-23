@@ -89,6 +89,82 @@ paths:
           description: Invalid input parameter. Ensure the "input" query parameter is provided and correctly formatted.
         '500':
           description: Internal server error. Indicates a problem with processing the request.
+  /get_drug_for_gene:
+    get:
+      operationId: getDrugForGene
+      summary: Retrieve drugs associated with a given gene
+      description: |
+        Returns a list of drug compounds (subjects) that are associated with a specified gene (object).
+        The relationships between drugs and genes are annotated using Biolink model terms.
+      parameters:
+        - name: input
+          in: query
+          description: |
+            The gene name or condition for which to find associated drug associations.
+            Example: "PPARG".
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response with drug-gene associations.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: array
+                    description: List of drug-gene association records.
+                    items:
+                      type: object
+                      properties:
+                        subject:
+                          type: object
+                          description: Information about the drug compound associated with the gene.
+                          properties:
+                            id:
+                              type: string
+                              description: |
+                                Compact identifier (CURIE) for the drug entity.  
+                                Typically a CHEBI identifier.
+                              example: CHEBI:27560
+                            name:
+                              type: string
+                              description: Common name of the drug compound.
+                              example: boron
+                        object:
+                          type: object
+                          description: Information about the gene being impacted.
+                          properties:
+                            id:
+                              type: string
+                              description: |
+                                Compact identifier (CURIE) for the disease entity.  
+                                Typically a NCBIGene ontology identifier.
+                              example: NCBIGene:5468
+                            name:
+                              type: string
+                              description: Human-readable gene name.
+                              example: PPARG
+                        relationship:
+                          type: string
+                          description: |
+                            Biolink model relationship describing the connection between the drug and the gene.  
+                            Example: "biolink:affects" indicates that the drug affects the disease.
+                          example: biolink:affects
+                        pubmed_ids:
+                          type: array
+                          description: |
+                            List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.
+                          items:
+                            type: string
+                            description: PubMed ID for a scientific publication.
+                            example: PMID:30997025
+        '400':
+          description: Invalid input parameter. Ensure the "input" query parameter is provided and correctly formatted.
+        '500':
+          description: Internal server error. Indicates a problem with processing the request.
 
 components:
   schemas:
