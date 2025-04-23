@@ -23,37 +23,50 @@ def query_trapi_rest_service(endpoint_url, list_target, list_predicates=["biolin
     Returns:
     - dict: The JSON response from the REST service.
     """
-    payload = {
-        "message": {
-            "query_graph": {
-                "nodes": {
-                    "source": {
-                        "categories": list_source_types
+    response = {}
+
+    # do the call
+    try:
+        payload = {
+            "message": {
+                "query_graph": {
+                    "nodes": {
+                        "source": {
+                            "categories": list_source_types
+                        },
+                        "target": {
+                            "ids": list_target,
+                            "categories": list_target_types
+                        }
                     },
-                    "target": {
-                        "ids": list_target,
-                        "categories": list_target_types
-                    }
-                },
-                "edges": {
-                    "e03": {
-                        "subject": "source",
-                        "object": "target",
-                        "predicates": list_predicates 
+                    "edges": {
+                        "e03": {
+                            "subject": "source",
+                            "object": "target",
+                            "predicates": list_predicates 
+                        }
                     }
                 }
             }
         }
-    }
 
-    if log:
-        print("sending payload: \n{}".format(json.dumps(payload, indent=2)))
+        if log:
+            print("sending payload: \n{}".format(json.dumps(payload, indent=2)))
 
-    headers = {"Content-Type": "application/json"}
+        headers = {"Content-Type": "application/json"}
 
-    # make REST call
-    response = requests.post(URL_TRANSLATOR_QUERY.format(endpoint_url), headers=headers, data=json.dumps(payload))
-    response.raise_for_status()  # Raises HTTPError for bad responses (4xx or 5xx)
+        # make REST call
+        response = requests.post(URL_TRANSLATOR_QUERY.format(endpoint_url), headers=headers, data=json.dumps(payload))
+        response.raise_for_status()  # Raises HTTPError for bad responses (4xx or 5xx)
+
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err} - Status Code: {response.status_code}")
+    except requests.exceptions.ConnectionError as conn_err:
+        print(f"Connection error occurred: {conn_err}")
+    except requests.exceptions.Timeout as timeout_err:
+        print(f"Timeout error occurred: {timeout_err}")
+    except requests.exceptions.RequestException as req_err:
+        print(f"An unexpected error occurred: {req_err}")
 
     # return
     return response.json()
@@ -143,23 +156,29 @@ def translate_trapi_results(map_trapi, log=False):
         source = None
         target = None
         publications = []
+        score = None
 
-        source_id = edge_data.get("subject")
-        target_id = edge_data.get("object")
+        source_id = edge_data.get(cutils.TRAPI_KEY_SUBJECT)
+        target_id = edge_data.get(cutils.TRAPI_KEY_OBJECT)
 
         if nodes.get(source_id) and nodes.get(target_id):
-            source = {cutils.KEY_ID: source_id, cutils.KEY_NAME: nodes.get(source_id, {}).get("name", {})}
-            target = {cutils.KEY_ID: target_id, cutils.KEY_NAME: nodes.get(target_id, {}).get("name", {})}
+            source = {cutils.KEY_ID: source_id, cutils.KEY_NAME: nodes.get(source_id, {}).get(cutils.TRAPI_KEY_NAME, {})}
+            target = {cutils.KEY_ID: target_id, cutils.KEY_NAME: nodes.get(target_id, {}).get(cutils.TRAPI_KEY_NAME, {})}
 
-            # get publications
-            for attribute in edge_data.get("attributes", []):
-                if attribute.get('attribute_type_id', "") == "biolink:publications":
-                    publications = attribute.get("value", [])
+            # get publications and scores
+            for attribute in edge_data.get(cutils.TRAPI_KEY_ATTRIBUTES, []):
+                if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_PUBLICATIONS:
+                    publications = attribute.get(cutils.TRAPI_KEY_VALUE, [])
 
-            predicate = edge_data.get("predicate")
+                if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_SCORE:
+                    score = attribute.get(cutils.TRAPI_KEY_VALUE, [])
+
+            predicate = edge_data.get(cutils.TRAPI_KEY_PREDICATE)
             edge_result = {cutils.KEY_SUBJECT: source, cutils.KEY_OBJECT: target, cutils.KEY_RELATIONSHIP: predicate}
             if len(publications) > 0:
                 edge_result[cutils.KEY_PUBLICATIONS] = publications
+            if score:
+                edge_result[cutils.KEY_SCORE] = score
             extracted_edges.append(edge_result)
     
     return extracted_edges

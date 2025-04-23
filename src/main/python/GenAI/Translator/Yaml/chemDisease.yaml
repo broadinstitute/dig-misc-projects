@@ -1,69 +1,130 @@
 openapi: 3.0.1
 info:
-  title: Compound-Disease Association API
-  version: "1.0.0"
+  title: Gene MCP Drug for Disease Translator API
   description: |
-    Returns an association between a chemical compound and a disease,
-    including subject/object identifiers, relationship type, and supporting PubMed references.
+    This API retrieves drugs associated with a given disease using the Model Context Protocol (MCP).  
+    Example query: Find drugs associated with "drug-induced liver injury".
+  version: "1.0.0"
+  contact:
+    name: Broad Institute Translator Team
+    url: https://translator.broadinstitute.org
+
 servers:
-  - url: https://example.org/get_drug_for_disease
+  - url: https://translator.broadinstitute.org/genetics_provider/gene_mcp
+
 paths:
-  /association:
+  /get_drug_for_disease:
     get:
-      summary: Get compound-disease association
-      description: Retrieve an association between a compound and a disease including evidence.
-      operationId: get_drug_for_disease
+      operationId: getDrugForDisease
+      summary: Retrieve drugs associated with a given disease
+      description: |
+        Returns a list of drug compounds (subjects) that are associated with a specified disease (object).
+        The relationships between drugs and diseases are annotated using Biolink model terms.
+      parameters:
+        - name: input
+          in: query
+          description: |
+            The disease name or condition for which to find associated drug treatments.  
+            Example: "drug-induced liver injury".
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: Successful response with drug to disease association data including pubmed id evidence
+          description: Successful response with drug-disease associations.
           content:
             application/json:
               schema:
                 type: object
-                description: A single compound-disease association with evidence
                 properties:
-                  subject:
-                    type: object
-                    description: The chemical compound involved in the association
-                    properties:
-                      id:
-                        type: string
-                        description: CURIE identifier of the compound (e.g., ChEMBL)
-                        example: "CHEMBL.COMPOUND:CHEMBL17"
-                      name:
-                        type: string
-                        description: Name of the compound
-                        example: "dichlorphenamide"
-                  object:
-                    type: object
-                    description: The disease or condition associated with the compound
-                    properties:
-                      id:
-                        type: string
-                        description: CURIE identifier of the disease (e.g., MONDO)
-                        example: "MONDO:0005359"
-                      name:
-                        type: string
-                        description: Name of the disease
-                        example: "drug-induced liver injury"
-                  relationship:
-                    type: string
-                    description: Predicate indicating the relationship type from Biolink model
-                    example: "biolink:associated_with"
-                  pubmed_ids:
+                  result:
                     type: array
-                    description: List of PubMed IDs supporting this association
+                    description: List of drug-disease association records.
                     items:
-                      type: string
-                      description: A PubMed identifier
-                      example: "PMID:14971821"
-tags:
-  - name: Association
-    description: Association between a compound and a disease including evidence.
+                      type: object
+                      properties:
+                        subject:
+                          type: object
+                          description: Information about the drug compound associated with the disease.
+                          properties:
+                            id:
+                              type: string
+                              description: |
+                                Compact identifier (CURIE) for the drug entity.  
+                                Typically a CHEBI identifier.
+                              example: CHEBI:27560
+                            name:
+                              type: string
+                              description: Common name of the drug compound.
+                              example: boron
+                        object:
+                          type: object
+                          description: Information about the disease or phenotype being treated.
+                          properties:
+                            id:
+                              type: string
+                              description: |
+                                Compact identifier (CURIE) for the disease entity.  
+                                Typically a MONDO ontology identifier.
+                              example: MONDO:0005359
+                            name:
+                              type: string
+                              description: Human-readable disease or phenotype name.
+                              example: drug-induced liver injury
+                        relationship:
+                          type: string
+                          description: |
+                            Biolink model relationship describing the connection between the drug and the disease.  
+                            Example: "biolink:treats" indicates that the drug treats the disease.
+                          example: biolink:treats
+                        pubmed_ids:
+                          type: array
+                          description: |
+                            List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.
+                          items:
+                            type: string
+                            description: PubMed ID for a scientific publication.
+                            example: PMID:30997025
+        '400':
+          description: Invalid input parameter. Ensure the "input" query parameter is provided and correctly formatted.
+        '500':
+          description: Internal server error. Indicates a problem with processing the request.
 
-x-translator:
-  component: KP
-  team:
-    - Service Provider Name
-  biolink-version: "3.0.0"
-  infores: "infores:example-api"
+components:
+  schemas:
+    Subject:
+      type: object
+      description: Drug compound information (subject of the association).
+      properties:
+        id:
+          type: string
+          description: Compact identifier (CHEBI CURIE) for the drug.
+        name:
+          type: string
+          description: Name of the drug compound.
+    Object:
+      type: object
+      description: Disease or phenotype information (object of the association).
+      properties:
+        id:
+          type: string
+          description: Compact identifier (MONDO CURIE) for the disease.
+        name:
+          type: string
+          description: Name of the disease or phenotype.
+    ResultItem:
+      type: object
+      description: Record representing one drug-disease association.
+      properties:
+        subject:
+          $ref: '#/components/schemas/Subject'
+        object:
+          $ref: '#/components/schemas/Object'
+        relationship:
+          type: string
+          description: Biolink relationship between the drug and the disease.
+        pubmed_ids:
+          type: array
+          description: List of PubMed IDs supporting the relationship.
+          items:
+            type: string
