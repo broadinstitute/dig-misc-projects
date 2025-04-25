@@ -157,6 +157,7 @@ def translate_trapi_results(map_trapi, log=False):
         target = None
         publications = []
         score = None
+        pValue = None
 
         source_id = edge_data.get(cutils.TRAPI_KEY_SUBJECT)
         target_id = edge_data.get(cutils.TRAPI_KEY_OBJECT)
@@ -173,12 +174,23 @@ def translate_trapi_results(map_trapi, log=False):
                 if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_SCORE:
                     score = attribute.get(cutils.TRAPI_KEY_VALUE, [])
 
+                if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_P_VALUE:
+                    pValue = attribute.get(cutils.TRAPI_KEY_VALUE, [])
+
             predicate = edge_data.get(cutils.TRAPI_KEY_PREDICATE)
             edge_result = {cutils.KEY_SUBJECT: source, cutils.KEY_OBJECT: target, cutils.KEY_RELATIONSHIP: predicate}
+
+            # add properties
             if len(publications) > 0:
                 edge_result[cutils.KEY_PUBLICATIONS] = publications
+
             if score:
                 edge_result[cutils.KEY_SCORE] = score
+
+            if pValue:
+                edge_result[cutils.KEY_P_VALUE] = pValue
+
+            # add edge
             extracted_edges.append(edge_result)
     
     return extracted_edges
