@@ -30,11 +30,14 @@ TRAPI_KEY_SCORE = "score"
 TRAPI_KEY_SCORE = "p-value"
 TRAPI_KEY_ATTRIBUTES = "attributes"
 TRAPI_KEY_ATTRIBUTE_TYPE_ID = "attribute_type_id"
+TRAPI_KEY_ORIGINAL_NAME = "original_attribute_name"
 
 
 # URLS
 URL_MOLEPRO = "https://translator.broadinstitute.org/molepro/trapi/v1.5"
 URL_GENETICSKP = "https://genetics-kp.ci.transltr.io/genetics_provider/trapi/v1.5"
+URL_AUTOMAT = "https://automat.ci.transltr.io/pharos"
+
 
 # LISTS
 LIST_ONTOLOGIES_DISEASE = ["MONDO"]

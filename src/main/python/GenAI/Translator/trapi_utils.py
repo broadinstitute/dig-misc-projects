@@ -110,7 +110,8 @@ def get_curies(entity_name, list_ontologies, limit=5, log=False):
     return list_result
 
 
-def query_trapi_for_string(endpoint_url, entity_name, list_ontologies, list_predicates=["biolink:related_to"], list_source_types=[], list_target_types=[], log=False):
+def query_trapi_for_string(endpoint_url, entity_name, list_ontologies, list_predicates=["biolink:related_to"], list_source_types=[], list_target_types=[], 
+                           sort=True, descending=False, field_to_sort=None, log=False):
     '''
     query name resolver first for curies, then the service itself an translate
     '''
@@ -136,13 +137,13 @@ def query_trapi_for_string(endpoint_url, entity_name, list_ontologies, list_pred
             print("translating trapi result: \n{}".format(json.dumps(map_trapi_response, indent=2)))
         
         # translate
-        list_result = translate_trapi_results(map_trapi=map_trapi_response, log=log)
+        list_result = translate_trapi_results(map_trapi=map_trapi_response, sort=sort, descending=descending, field_to_sort=field_to_sort, log=log)
     
     # return
     return list_result
 
 
-def translate_trapi_results(map_trapi, log=False):
+def translate_trapi_results(map_trapi, num_limit=100, sort=True, descending=True, field_to_sort=None, log=False):
     '''
     will translate trapui result to more condensed format
     '''
@@ -171,11 +172,11 @@ def translate_trapi_results(map_trapi, log=False):
                 if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_PUBLICATIONS:
                     publications = attribute.get(cutils.TRAPI_KEY_VALUE, [])
 
-                if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_SCORE:
-                    score = attribute.get(cutils.TRAPI_KEY_VALUE, [])
+                if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_SCORE or attribute.get(cutils.TRAPI_KEY_ORIGINAL_NAME, "") == cutils.KEY_SCORE:
+                    score = attribute.get(cutils.TRAPI_KEY_VALUE, "")
 
                 if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_P_VALUE:
-                    pValue = attribute.get(cutils.TRAPI_KEY_VALUE, [])
+                    pValue = attribute.get(cutils.TRAPI_KEY_VALUE, "")
 
             predicate = edge_data.get(cutils.TRAPI_KEY_PREDICATE)
             edge_result = {cutils.KEY_SUBJECT: source, cutils.KEY_OBJECT: target, cutils.KEY_RELATIONSHIP: predicate}
@@ -192,8 +193,14 @@ def translate_trapi_results(map_trapi, log=False):
 
             # add edge
             extracted_edges.append(edge_result)
-    
-    return extracted_edges
+
+    # see if need to sort
+    if field_to_sort and sort:
+        sorted_elements = sorted(extracted_edges, key=lambda x: x.get(field_to_sort, 0), reverse=descending)
+        extracted_edges = sorted_elements
+   
+    # return
+    return extracted_edges[0:num_limit]
     
 
 # main

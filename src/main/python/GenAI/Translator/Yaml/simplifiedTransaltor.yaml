@@ -172,6 +172,89 @@ paths:
           description: Invalid input parameter. Ensure the "input" query parameter is provided and correctly formatted.
         '500':
           description: Internal server error. Indicates a problem with processing the request.
+  /get_gene_for_disease_automat:
+    get:
+      operationId: getGeneForDiseaseAutomat
+      summary: Retrieve gene associated with a given disease
+      description: |
+        Returns a list of genes (subjects) that are associated with a specified disease (object).
+        The relationships between genes and diseases are annotated using Biolink model terms.
+      parameters:
+        - name: input
+          in: query
+          description: |
+            The disease name or condition for which to find associated genes.  
+            Example: "drug-induced liver injury".
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response with drug-disease associations.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: array
+                    description: List of gene-disease association records.
+                    items:
+                      type: object
+                      properties:
+                        subject:
+                          type: object
+                          description: Information about the gene associated with the disease.
+                          properties:
+                            id:
+                              type: string
+                              description: |
+                                Compact identifier (CURIE) for the gene entity.  
+                                Typically a NCBIGene identifier.
+                              example: NCBIGene:10144
+                            name:
+                              type: string
+                              description: Common name of the gene.
+                              example: FAM13A
+                        object:
+                          type: object
+                          description: Information about the disease or phenotype associated.
+                          properties:
+                            id:
+                              type: string
+                              description: |
+                                Compact identifier (CURIE) for the disease entity.  
+                                Typically a MONDO ontology identifier.
+                              example: MONDO:0005359
+                            name:
+                              type: string
+                              description: Human-readable disease or phenotype name.
+                              example: drug-induced liver injury
+                        relationship:
+                          type: string
+                          description: |
+                            Biolink model relationship describing the connection between the gene and the disease.  
+                            Example: "biolink:gene_associated_with_condition" indicates that the gene is genetically associated with the disease.
+                          example: biolink:gene_associated_with_condition
+                        pubmed_ids:
+                          type: array
+                          description: |
+                            List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.
+                          items:
+                            type: string
+                            description: PubMed ID for a scientific publication.
+                            example: PMID:30997025
+                        score:
+                          type: number
+                          format: float
+                          description: |
+                            The computed score between 0 and 1 that reflects the strength of association between the gene and disease
+                            Example: 0.875909686 indicates that the gene is strongly genetically associated with the disease.
+                          example: 0.875909686
+        '400':
+          description: Invalid input parameter. Ensure the "input" query parameter is provided and correctly formatted.
+        '500':
+          description: Internal server error. Indicates a problem with processing the request.
   /get_pathway_for_disease:
     get:
       operationId: getPathwayForDisease
