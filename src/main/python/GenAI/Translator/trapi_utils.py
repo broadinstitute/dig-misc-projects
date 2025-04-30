@@ -159,6 +159,8 @@ def translate_trapi_results(map_trapi, num_limit=100, sort=True, descending=True
         publications = []
         score = None
         pValue = None
+        level = None
+        reliability = None
 
         source_id = edge_data.get(cutils.TRAPI_KEY_SUBJECT)
         target_id = edge_data.get(cutils.TRAPI_KEY_OBJECT)
@@ -178,6 +180,12 @@ def translate_trapi_results(map_trapi, num_limit=100, sort=True, descending=True
                 if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_P_VALUE:
                     pValue = attribute.get(cutils.TRAPI_KEY_VALUE, "")
 
+                if attribute.get(cutils.TRAPI_KEY_ORIGINAL_NAME, "") == cutils.TRAPI_KEY_LEVEL:
+                    level = attribute.get(cutils.TRAPI_KEY_VALUE, "")
+
+                if attribute.get(cutils.TRAPI_KEY_ORIGINAL_NAME, "") == cutils.TRAPI_KEY_RELIABILITY:
+                    reliability = attribute.get(cutils.TRAPI_KEY_VALUE, "")
+
             predicate = edge_data.get(cutils.TRAPI_KEY_PREDICATE)
             edge_result = {cutils.KEY_SUBJECT: source, cutils.KEY_OBJECT: target, cutils.KEY_RELATIONSHIP: predicate}
 
@@ -190,6 +198,11 @@ def translate_trapi_results(map_trapi, num_limit=100, sort=True, descending=True
 
             if pValue:
                 edge_result[cutils.KEY_P_VALUE] = pValue
+
+            if level and reliability:
+                edge_result[cutils.KEY_LEVEL] = level
+                edge_result[cutils.KEY_RELIABILITY] = reliability
+
 
             # add edge
             extracted_edges.append(edge_result)

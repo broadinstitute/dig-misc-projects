@@ -79,4 +79,16 @@ def reverse_string(input: str = Query(..., description="gene")):
     return JSONResponse(content={'result': list_result})
 
 
+@app.get("/get_cell_for_gene")
+def reverse_string(input: str = Query(..., description="gene")):
+    # call the method
+    # reversed_str = input[::-1]
+    print("got input: {}".format(input))
+    list_result = query_trapi_for_string(endpoint_url=cutils.URL_SPOKE, entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_GENE,
+                                         list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_CELL, 
+                                         list_target_types=cutils.LIST_ENTITIES_GENE, log=True)    
+    # return
+    # return JSONResponse(content={"original": input, "reversed": reversed_str})
+    return JSONResponse(content={'result': list_result})
+
 
