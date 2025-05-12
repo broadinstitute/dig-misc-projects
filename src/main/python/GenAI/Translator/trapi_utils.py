@@ -152,7 +152,7 @@ def translate_trapi_results(map_trapi, num_limit=100, sort=True, descending=True
 
     # extract
     trapi_message = map_trapi.get("message", {})
-    if trapi_message:
+    if trapi_message and type(trapi_message) == dict:
         trapi_kg = trapi_message.get("knowledge_graph", {})
         if trapi_kg:
             # edges = map_trapi.get("message", {}).get("knowledge_graph", {}).get("edges", {})
@@ -247,7 +247,7 @@ def query_trapi_list_for_string(list_endpoint_url, entity_name, list_ontologies,
 
             # do the trapi query
             map_trapi_response = query_trapi_rest_service(endpoint_url=url_trapi, list_target=list_curies, list_predicates=list_predicates, 
-                                                        list_source_types=list_source_types, list_target_types=list_target_types, log=log)
+                                                        list_source_types=list_source_types, list_target_types=list_target_types, log=True)
             
             # log
             if log:
