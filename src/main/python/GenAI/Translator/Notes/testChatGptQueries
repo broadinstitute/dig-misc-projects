@@ -1,6 +1,24 @@
 
 
 
+
+============================================================================================
+using both association of biological process association to disease and gene association to disease, indicate how the PPARG gene impacts type 2 diabetes and what tissues the gene is expressed in. 
+Please return any REST query score or p-value or reliability used.
+
+
+
+
+
+
+
+============================================================================================
+using both association of biological process association to disease and gene association to disease, indicate how the PPARG gene impacts type 2 diabetes. Please return any REST query score or p-value used.
+
+
+
+
+============================================================================================
 for the disease psoriatic arthropathy, follow the following steps:
 find genes that are associated with the disease, take the top 5 based on association strength scores
 then find drugs that affect those genes with any listed pubmed article ids

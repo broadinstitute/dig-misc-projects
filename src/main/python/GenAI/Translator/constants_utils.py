@@ -42,6 +42,45 @@ URL_MOLEPRO = "https://translator.broadinstitute.org/molepro/trapi/v1.5"
 URL_GENETICSKP = "https://genetics-kp.ci.transltr.io/genetics_provider/trapi/v1.5"
 URL_AUTOMAT = "https://automat.ci.transltr.io/pharos"
 URL_SPOKE = "https://spokekp.transltr.io/api/v1.5"
+URL_FDA = "https://multiomics.rtx.ai:9990/dakp"
+URL_RTX_KG2 = "https://kg2cploverdb.transltr.io"
+URL_MULTIOMICS = "https://multiomics.transltr.io/mokp"
+URL_MICROBIOME = "https://multiomics.transltr.io/mbkp"
+URL_COHD = "https://cohd-api.transltr.io/api"
+URL_ROBOKOP = "https://automat.transltr.io/robokopkg"
+URL_CLINICAL = "https://automat.renci.org/ehr-clinical-connections-kp"
+# dropped
+URL_CONNECTIONS = "https://chp-api.transltr.io" # only genes to tissue
+URL_SERVICE_PROVIDER = "https://bte.transltr.io/v1/team/Service%20Provider" # not working
+
+
+# URL LISTS
+LIST_URL_ALL = [
+    URL_MOLEPRO, URL_GENETICSKP, URL_AUTOMAT, URL_SPOKE, URL_FDA, 
+    URL_RTX_KG2, URL_MULTIOMICS, URL_MICROBIOME, URL_CLINICAL, URL_COHD,
+    URL_ROBOKOP
+]
+# TODO - drug/disease
+LIST_URL_DRUG_DISEASE = [URL_MOLEPRO, URL_AUTOMAT, URL_FDA, URL_RTX_KG2]
+# TODO - gene/disease
+LIST_URL_GENE_DISEASE = [URL_GENETICSKP, URL_RTX_KG2]
+# TODO - gene/drug
+LIST_URL_DRUG_GENE = [URL_MOLEPRO, URL_RTX_KG2]
+# TODO - drug/pathway
+LIST_URL_DRUG_PATHWAY = [URL_MOLEPRO, URL_RTX_KG2]
+# TODO - gene/gene
+LIST_URL_GENE_GENE = [URL_RTX_KG2, URL_MOLEPRO]
+# TODO - drug/cell
+LIST_URL_DRUG_TISSUE = [URL_RTX_KG2]
+# TODO - drug/drug
+LIST_URL_DRUG_DRUG = [URL_RTX_KG2]
+# TODO - pathway/disease
+LIST_URL_PATHWAY_DISEASE = [URL_GENETICSKP, URL_RTX_KG2]
+# TODO - tissue/disease
+LIST_URL_TISSUE_DISEASE = [URL_RTX_KG2]
+# TODO - gene/tissue
+LIST_URL_GENE_TISSUE = [URL_RTX_KG2, URL_MOLEPRO]
+
 
 
 # LISTS

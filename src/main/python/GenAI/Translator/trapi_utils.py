@@ -147,73 +147,128 @@ def translate_trapi_results(map_trapi, num_limit=100, sort=True, descending=True
     '''
     will translate trapui result to more condensed format
     '''
-    edges = map_trapi.get("message", {}).get("knowledge_graph", {}).get("edges", {})
-    nodes = map_trapi.get("message", {}).get("knowledge_graph", {}).get("nodes", {})
-
-    # extract the nodes
-    
+    # initialize
     extracted_edges = []
-    for edge_id, edge_data in edges.items():
-        source = None
-        target = None
-        publications = []
-        score = None
-        pValue = None
-        level = None
-        reliability = None
 
-        source_id = edge_data.get(cutils.TRAPI_KEY_SUBJECT)
-        target_id = edge_data.get(cutils.TRAPI_KEY_OBJECT)
+    # extract
+    trapi_message = map_trapi.get("message", {})
+    if trapi_message:
+        trapi_kg = trapi_message.get("knowledge_graph", {})
+        if trapi_kg:
+            # edges = map_trapi.get("message", {}).get("knowledge_graph", {}).get("edges", {})
+            # nodes = map_trapi.get("message", {}).get("knowledge_graph", {}).get("nodes", {})
+            edges = trapi_kg.get('edges', {})
+            nodes = trapi_kg.get('nodes', {})
 
-        if nodes.get(source_id) and nodes.get(target_id):
-            source = {cutils.KEY_ID: source_id, cutils.KEY_NAME: nodes.get(source_id, {}).get(cutils.TRAPI_KEY_NAME, {})}
-            target = {cutils.KEY_ID: target_id, cutils.KEY_NAME: nodes.get(target_id, {}).get(cutils.TRAPI_KEY_NAME, {})}
+            # extract the nodes
+            extracted_edges = []
+            for edge_id, edge_data in edges.items():
+                source = None
+                target = None
+                publications = []
+                score = None
+                pValue = None
+                level = None
+                reliability = None
 
-            # get publications and scores
-            for attribute in edge_data.get(cutils.TRAPI_KEY_ATTRIBUTES, []):
-                if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_PUBLICATIONS:
-                    publications = attribute.get(cutils.TRAPI_KEY_VALUE, [])
+                source_id = edge_data.get(cutils.TRAPI_KEY_SUBJECT)
+                target_id = edge_data.get(cutils.TRAPI_KEY_OBJECT)
 
-                if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_SCORE or attribute.get(cutils.TRAPI_KEY_ORIGINAL_NAME, "") == cutils.KEY_SCORE:
-                    score = attribute.get(cutils.TRAPI_KEY_VALUE, "")
+                if nodes.get(source_id) and nodes.get(target_id):
+                    source = {cutils.KEY_ID: source_id, cutils.KEY_NAME: nodes.get(source_id, {}).get(cutils.TRAPI_KEY_NAME, {})}
+                    target = {cutils.KEY_ID: target_id, cutils.KEY_NAME: nodes.get(target_id, {}).get(cutils.TRAPI_KEY_NAME, {})}
 
-                if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_P_VALUE:
-                    pValue = attribute.get(cutils.TRAPI_KEY_VALUE, "")
+                    # get publications and scores
+                    for attribute in edge_data.get(cutils.TRAPI_KEY_ATTRIBUTES, []):
+                        if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_PUBLICATIONS:
+                            publications = attribute.get(cutils.TRAPI_KEY_VALUE, [])
 
-                if attribute.get(cutils.TRAPI_KEY_ORIGINAL_NAME, "") == cutils.TRAPI_KEY_LEVEL:
-                    level = attribute.get(cutils.TRAPI_KEY_VALUE, "")
+                        if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_SCORE or attribute.get(cutils.TRAPI_KEY_ORIGINAL_NAME, "") == cutils.KEY_SCORE:
+                            score = attribute.get(cutils.TRAPI_KEY_VALUE, "")
 
-                if attribute.get(cutils.TRAPI_KEY_ORIGINAL_NAME, "") == cutils.TRAPI_KEY_RELIABILITY:
-                    reliability = attribute.get(cutils.TRAPI_KEY_VALUE, "")
+                        if attribute.get(cutils.TRAPI_KEY_ATTRIBUTE_TYPE_ID, "") == cutils.BIOLINK_P_VALUE:
+                            pValue = attribute.get(cutils.TRAPI_KEY_VALUE, "")
 
-            predicate = edge_data.get(cutils.TRAPI_KEY_PREDICATE)
-            edge_result = {cutils.KEY_SUBJECT: source, cutils.KEY_OBJECT: target, cutils.KEY_RELATIONSHIP: predicate}
+                        if attribute.get(cutils.TRAPI_KEY_ORIGINAL_NAME, "") == cutils.TRAPI_KEY_LEVEL:
+                            level = attribute.get(cutils.TRAPI_KEY_VALUE, "")
 
-            # add properties
-            if len(publications) > 0:
-                edge_result[cutils.KEY_PUBLICATIONS] = publications
+                        if attribute.get(cutils.TRAPI_KEY_ORIGINAL_NAME, "") == cutils.TRAPI_KEY_RELIABILITY:
+                            reliability = attribute.get(cutils.TRAPI_KEY_VALUE, "")
 
-            if score:
-                edge_result[cutils.KEY_SCORE] = score
+                    predicate = edge_data.get(cutils.TRAPI_KEY_PREDICATE)
+                    edge_result = {cutils.KEY_SUBJECT: source, cutils.KEY_OBJECT: target, cutils.KEY_RELATIONSHIP: predicate}
 
-            if pValue:
-                edge_result[cutils.KEY_P_VALUE] = pValue
+                    # add properties
+                    if len(publications) > 0:
+                        edge_result[cutils.KEY_PUBLICATIONS] = publications
 
-            if level and reliability:
-                edge_result[cutils.KEY_LEVEL] = level
-                edge_result[cutils.KEY_RELIABILITY] = reliability
+                    if score:
+                        edge_result[cutils.KEY_SCORE] = score
+
+                    if pValue:
+                        edge_result[cutils.KEY_P_VALUE] = pValue
+
+                    if level and reliability:
+                        edge_result[cutils.KEY_LEVEL] = level
+                        edge_result[cutils.KEY_RELIABILITY] = reliability
 
 
-            # add edge
-            extracted_edges.append(edge_result)
+                    # add edge
+                    extracted_edges.append(edge_result)
 
     # see if need to sort
-    if field_to_sort and sort:
+    if field_to_sort and sort and len(extracted_edges) > 0:
         sorted_elements = sorted(extracted_edges, key=lambda x: x.get(field_to_sort, 0), reverse=descending)
         extracted_edges = sorted_elements
    
     # return
     return extracted_edges[0:num_limit]
+
+
+def query_trapi_list_for_string(list_endpoint_url, entity_name, list_ontologies, list_predicates=["biolink:related_to"], list_source_types=[], list_target_types=[], 
+                           sort=True, descending=False, field_to_sort=None, log=False):
+    '''
+    query name resolver first for curies, then the service itself an translate
+    '''
+    # initialize
+    map_trapi_response = {}
+    list_result = []
+    list_curies = []
+    list_total_results = []
+
+    # get the list of curies
+    list_curies = get_curies(entity_name=entity_name, list_ontologies=list_ontologies, log=log)
+
+    if len(list_curies) > 0:
+        # loop through trapi URLS
+        for url_trapi in list_endpoint_url:
+            # log
+            print("querying endpoint: {}".format(url_trapi))
+
+            # do the trapi query
+            map_trapi_response = query_trapi_rest_service(endpoint_url=url_trapi, list_target=list_curies, list_predicates=list_predicates, 
+                                                        list_source_types=list_source_types, list_target_types=list_target_types, log=log)
+            
+            # log
+            if log:
+                print("translating trapi result: \n{}".format(json.dumps(map_trapi_response, indent=2)))
+            
+            # translate
+            list_result = translate_trapi_results(map_trapi=map_trapi_response, sort=sort, descending=descending, field_to_sort=field_to_sort, log=log)
+
+            # log
+            print("got num result: {} for: {}".format(len(list_result), url_trapi))
+
+            # add to results
+            list_total_results = list_total_results + list_result
+
+    
+    # log total results returns
+    print("returning for curies: {}, total results: {}".format(list_curies, len(list_total_results)))
+
+    # return
+    return list_total_results
+
     
 
 # main
