@@ -247,7 +247,7 @@ def query_trapi_list_for_string(list_endpoint_url, entity_name, list_ontologies,
 
             # do the trapi query
             map_trapi_response = query_trapi_rest_service(endpoint_url=url_trapi, list_target=list_curies, list_predicates=list_predicates, 
-                                                        list_source_types=list_source_types, list_target_types=list_target_types, log=True)
+                                                        list_source_types=list_source_types, list_target_types=list_target_types, log=False)
             
             # log
             if log:
