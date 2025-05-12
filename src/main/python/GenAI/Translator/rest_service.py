@@ -107,7 +107,6 @@ def get_cell_for_gene(request: Request, input: str = Query(..., description="gen
     #                                      list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_CELL, 
     #                                      list_target_types=cutils.LIST_ENTITIES_GENE, log=False)    
 
-    print("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_trapi_list_for_string(list_endpoint_url=cutils.LIST_URL_ALL, entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_GENE,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_CELL, 
                                          list_target_types=cutils.LIST_ENTITIES_GENE, log=False)    
