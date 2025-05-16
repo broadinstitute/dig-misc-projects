@@ -15,6 +15,302 @@
         }
     ],
     "paths": {
+        "/get_disease_for_disease": {
+            "get": {
+                "operationId": "getDiseaseForDisease",
+                "summary": "Retrieve diseases associated with a given disease",
+                "description": "Returns a list of diseases (subjects) that are associated with a specified disease (object).\nThe relationships between disease and diseases are annotated using Biolink model terms.",
+                "parameters": [
+                    {
+                        "name": "input",
+                        "in": "query",
+                        "description": "The disease name or condition for which to find associated tissue associations.\nExample: \"Type 2 Diabetes\".",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with tissue-disease associations.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "array",
+                                            "description": "List of disease-disease association records.",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "subject": {
+                                                        "type": "object",
+                                                        "description": "Information about the diseases associated with the disease.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the disease entity.",
+                                                                "example": "MONDO:0001905"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Human-readable disease name.",
+                                                                "example": "bicipital tenosynovitis"
+                                                            }
+                                                        }
+                                                    },
+                                                    "object": {
+                                                        "type": "object",
+                                                        "description": "Information about the disease being impacted.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the disease entity.",
+                                                                "example": "MONDO:0006816"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Human-readable disease name.",
+                                                                "example": "arthropathy"
+                                                            }
+                                                        }
+                                                    },
+                                                    "relationship": {
+                                                        "type": "string",
+                                                        "description": "Biolink model relationship between the tissue and the disease.",
+                                                        "example": "biolink:positively_correlated_with"
+                                                    },
+                                                    "pubmed_ids": {
+                                                        "type": "array",
+                                                        "description": "List of supporting PubMed article identifiers.",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "example": "PMID:30997025"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input parameter. Ensure the \"input\" query parameter is provided and correctly formatted."
+                    },
+                    "500": {
+                        "description": "Internal server error. Indicates a problem with processing the request."
+                    }
+                }
+            }
+        },
+        "/get_cell_for_disease": {
+            "get": {
+                "operationId": "getCellForDisease",
+                "summary": "Retrieve tissues associated with a given disease",
+                "description": "Returns a list of tissues (subjects) that are associated with a specified disease (object).\nThe relationships between tissues and diseases are annotated using Biolink model terms.",
+                "parameters": [
+                    {
+                        "name": "input",
+                        "in": "query",
+                        "description": "The disease name or condition for which to find associated tissue associations.\nExample: \"Type 2 Diabetes\".",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with tissue-disease associations.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "array",
+                                            "description": "List of tissue-disease association records.",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "subject": {
+                                                        "type": "object",
+                                                        "description": "Information about the tissues associated with the disease.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the tissue entity.",
+                                                                "example": "UBERON:0001013"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Common name of the tissue.",
+                                                                "example": "adipocytes in adipose tissue"
+                                                            }
+                                                        }
+                                                    },
+                                                    "object": {
+                                                        "type": "object",
+                                                        "description": "Information about the disease being impacted.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the disease entity.",
+                                                                "example": "MONDO:0024686"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Human-readable disease name.",
+                                                                "example": "tenosynovial giant cell tumor, diffuse type"
+                                                            }
+                                                        }
+                                                    },
+                                                    "relationship": {
+                                                        "type": "string",
+                                                        "description": "Biolink model relationship between the tissue and the disease.",
+                                                        "example": "biolink:derives_from"
+                                                    },
+                                                    "level": {
+                                                        "type": "string",
+                                                        "description": "A qualitative value of the level recorded for the association",
+                                                        "example": "Low"
+                                                    },
+                                                    "reliability": {
+                                                        "type": "string",
+                                                        "description": "A qualitative value of the confidence of the association",
+                                                        "example": "High"
+                                                    },
+                                                    "pubmed_ids": {
+                                                        "type": "array",
+                                                        "description": "List of supporting PubMed article identifiers.",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "example": "PMID:30997025"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input parameter. Ensure the \"input\" query parameter is provided and correctly formatted."
+                    },
+                    "500": {
+                        "description": "Internal server error. Indicates a problem with processing the request."
+                    }
+                }
+            }
+        },
+        "/get_disease_for_cell": {
+            "get": {
+                "operationId": "getDiseaseForCell",
+                "summary": "Retrieve diseases associated with a given tissue",
+                "description": "Returns a list of diseases (subjects) that are associated with a specified tissue (object).\nThe relationships between diseases and tissue are annotated using Biolink model terms.",
+                "parameters": [
+                    {
+                        "name": "input",
+                        "in": "query",
+                        "description": "The tissue name or condition for which to find associated disease associations.\nExample: \"adipocytes in adipose tissue\".",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with disease-tissue associations.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "array",
+                                            "description": "List of disease-tissue association records.",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "object": {
+                                                        "type": "object",
+                                                        "description": "Information about the tissues associated with the disease.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the tissue entity.",
+                                                                "example": "UBERON:0001013"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Common name of the tissue.",
+                                                                "example": "adipocytes in adipose tissue"
+                                                            }
+                                                        }
+                                                    },
+                                                    "subject": {
+                                                        "type": "object",
+                                                        "description": "Information about the disease being impacted.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the disease entity.",
+                                                                "example": "MONDO:0024686"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Human-readable disease name.",
+                                                                "example": "tenosynovial giant cell tumor, diffuse type"
+                                                            }
+                                                        }
+                                                    },
+                                                    "relationship": {
+                                                        "type": "string",
+                                                        "description": "Biolink model relationship between the disease and the tissue.",
+                                                        "example": "biolink:expresses"
+                                                    },
+                                                    "level": {
+                                                        "type": "string",
+                                                        "description": "A qualitative value of the level recorded for the association",
+                                                        "example": "Low"
+                                                    },
+                                                    "reliability": {
+                                                        "type": "string",
+                                                        "description": "A qualitative value of the confidence of the association",
+                                                        "example": "High"
+                                                    },
+                                                    "pubmed_ids": {
+                                                        "type": "array",
+                                                        "description": "List of supporting PubMed article identifiers.",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "example": "PMID:30997025"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input parameter. Ensure the \"input\" query parameter is provided and correctly formatted."
+                    },
+                    "500": {
+                        "description": "Internal server error. Indicates a problem with processing the request."
+                    }
+                }
+            }
+        },
         "/get_cell_for_gene": {
             "get": {
                 "operationId": "getCellForGene",
@@ -143,7 +439,7 @@
                                     "properties": {
                                         "result": {
                                             "type": "array",
-                                            "description": "List of tissue-gene association records.",
+                                            "description": "List of gene-tissue association records.",
                                             "items": {
                                                 "type": "object",
                                                 "properties": {

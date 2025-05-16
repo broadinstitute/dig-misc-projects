@@ -194,6 +194,50 @@ def get_cell_for_gene(request: Request, input: str = Query(..., description="gen
     return JSONResponse(content={'result': list_result})
 
 
+@app.get("/get_cell_for_disease")
+def get_cell_for_gene(request: Request, input: str = Query(..., description="disease")):
+    # call the method
+    # reversed_str = input[::-1]
+    print("for: {}, got input: {}".format(request.url.path, input))
+    list_result = query_trapi_list_for_string(list_endpoint_url=cutils.LIST_URL_ALL, entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_DISEASE,
+                                         list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_CELL, 
+                                         list_target_types=cutils.LIST_ENTITIES_DISEASE, log=False)    
+
+    # return JSONResponse(content={"original": input, "reversed": reversed_str})
+    return JSONResponse(content={'result': list_result})
+
+
+@app.get("/get_disease_for_cell")
+def get_cell_for_gene(request: Request, input: str = Query(..., description="cell")):
+    # call the method
+    # reversed_str = input[::-1]
+    print("for: {}, got input: {}".format(request.url.path, input))
+    list_result = query_trapi_list_for_string(list_endpoint_url=cutils.LIST_URL_ALL, entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_CELL,
+                                         list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_DISEASE, 
+                                         list_target_types=cutils.LIST_ENTITIES_CELL, log=False)    
+
+    # return JSONResponse(content={"original": input, "reversed": reversed_str})
+    return JSONResponse(content={'result': list_result})
+
+
+@app.get("/get_disease_for_disease")
+def get_cell_for_gene(request: Request, input: str = Query(..., description="disease")):
+    # call the method
+    # reversed_str = input[::-1]
+    print("for: {}, got input: {}".format(request.url.path, input))
+    list_result = query_trapi_list_for_string(list_endpoint_url=cutils.LIST_URL_ALL, entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_DISEASE,
+                                         list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_DISEASE, 
+                                         list_target_types=cutils.LIST_ENTITIES_DISEASE, log=False)    
+
+    # return JSONResponse(content={"original": input, "reversed": reversed_str})
+    return JSONResponse(content={'result': list_result})
+
+
+
+
+
+
+
 
 @app.get("/get_common_pathways")
 def get_common_pathways(request: Request, input: str = Query(..., description="gene")):

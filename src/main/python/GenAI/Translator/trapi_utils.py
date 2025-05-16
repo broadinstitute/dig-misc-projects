@@ -24,6 +24,7 @@ def query_trapi_rest_service(endpoint_url, list_target, list_predicates=["biolin
     - dict: The JSON response from the REST service.
     """
     response = {}
+    result = {}
 
     # do the call
     try:
@@ -57,6 +58,9 @@ def query_trapi_rest_service(endpoint_url, list_target, list_predicates=["biolin
 
         # make REST call
         response = requests.post(URL_TRANSLATOR_QUERY.format(endpoint_url), headers=headers, data=json.dumps(payload))
+        print("got response: {}".format(response))
+        result = response.json()
+
         response.raise_for_status()  # Raises HTTPError for bad responses (4xx or 5xx)
 
     except requests.exceptions.HTTPError as http_err:
@@ -67,9 +71,11 @@ def query_trapi_rest_service(endpoint_url, list_target, list_predicates=["biolin
         print(f"Timeout error occurred: {timeout_err}")
     except requests.exceptions.RequestException as req_err:
         print(f"An unexpected error occurred: {req_err}")
+    except Exception as e:
+        print(f"An general error occurred: {e}")
 
     # return
-    return response.json()
+    return result
 
 
 def get_curies(entity_name, list_ontologies, limit=5, log=False):
