@@ -1,0 +1,7 @@
+{
+    "statements": [
+        {
+            "statement": "MATCH (n) RETURN n LIMIT 10"
+        }
+    ]
+}

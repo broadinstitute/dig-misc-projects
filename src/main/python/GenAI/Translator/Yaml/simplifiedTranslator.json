@@ -1,0 +1,278 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Gene MCP Drug for Disease Translator API",
+        "description": "This API retrieves drugs associated with a given disease using the Model Context Protocol (MCP).\nExample query: Find drugs associated with \"drug-induced liver injury\".",
+        "version": "1.0.0",
+        "contact": {
+            "name": "Broad Institute Translator Team",
+            "url": "https://translator.broadinstitute.org"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://translator.broadinstitute.org/genetics_provider/gene_mcp"
+        }
+    ],
+    "paths": {
+        "/get_cell_for_gene": {
+            "get": {
+                "operationId": "getCellForGene",
+                "summary": "Retrieve tissues associated with a given gene",
+                "description": "Returns a list of tissues (subjects) that are associated with a specified gene (object).\nThe relationships between tissues and genes are annotated using Biolink model terms.",
+                "parameters": [
+                    {
+                        "name": "input",
+                        "in": "query",
+                        "description": "The gene name or condition for which to find associated tissue associations.\nExample: \"PPARG\".",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with tissue-gene associations.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "array",
+                                            "description": "List of tissue-gene association records.",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "subject": {
+                                                        "type": "object",
+                                                        "description": "Information about the tissues associated with the gene.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the tissue entity.",
+                                                                "example": "UBERON:0001013"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Common name of the tissue.",
+                                                                "example": "adipocytes in adipose tissue"
+                                                            }
+                                                        }
+                                                    },
+                                                    "object": {
+                                                        "type": "object",
+                                                        "description": "Information about the gene being impacted.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the gene entity.",
+                                                                "example": "NCBIGene:5468"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Human-readable gene name.",
+                                                                "example": "PPARG"
+                                                            }
+                                                        }
+                                                    },
+                                                    "relationship": {
+                                                        "type": "string",
+                                                        "description": "Biolink model relationship between the tissue and the gene.",
+                                                        "example": "biolink:expresses"
+                                                    },
+                                                    "level": {
+                                                        "type": "string",
+                                                        "description": "A qualitative value of the level recorded for the association",
+                                                        "example": "Low"
+                                                    },
+                                                    "reliability": {
+                                                        "type": "string",
+                                                        "description": "A qualitative value of the confidence of the association",
+                                                        "example": "High"
+                                                    },
+                                                    "pubmed_ids": {
+                                                        "type": "array",
+                                                        "description": "List of supporting PubMed article identifiers.",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "example": "PMID:30997025"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input parameter. Ensure the \"input\" query parameter is provided and correctly formatted."
+                    },
+                    "500": {
+                        "description": "Internal server error. Indicates a problem with processing the request."
+                    }
+                }
+            }
+        },
+        "/get_gene_for_cell": {
+            "get": {
+                "operationId": "getGeneForCell",
+                "summary": "Retrieve genes associated with a given tissue",
+                "description": "Returns a list of genes (subjects) that are associated with a specified tissue (object).\nThe relationships between genes and tissue are annotated using Biolink model terms.",
+                "parameters": [
+                    {
+                        "name": "input",
+                        "in": "query",
+                        "description": "The tissue name or condition for which to find associated gene associations.\nExample: \"adipocytes in adipose tissue\".",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with gene-tissue associations.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "array",
+                                            "description": "List of tissue-gene association records.",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "object": {
+                                                        "type": "object",
+                                                        "description": "Information about the tissues associated with the gene.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the tissue entity.",
+                                                                "example": "UBERON:0001013"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Common name of the tissue.",
+                                                                "example": "adipocytes in adipose tissue"
+                                                            }
+                                                        }
+                                                    },
+                                                    "subject": {
+                                                        "type": "object",
+                                                        "description": "Information about the gene being impacted.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the gene entity.",
+                                                                "example": "NCBIGene:5468"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Human-readable gene name.",
+                                                                "example": "PPARG"
+                                                            }
+                                                        }
+                                                    },
+                                                    "relationship": {
+                                                        "type": "string",
+                                                        "description": "Biolink model relationship between the gene and the tossue.",
+                                                        "example": "biolink:expresses"
+                                                    },
+                                                    "level": {
+                                                        "type": "string",
+                                                        "description": "A qualitative value of the level recorded for the association",
+                                                        "example": "Low"
+                                                    },
+                                                    "reliability": {
+                                                        "type": "string",
+                                                        "description": "A qualitative value of the confidence of the association",
+                                                        "example": "High"
+                                                    },
+                                                    "pubmed_ids": {
+                                                        "type": "array",
+                                                        "description": "List of supporting PubMed article identifiers.",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "example": "PMID:30997025"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input parameter. Ensure the \"input\" query parameter is provided and correctly formatted."
+                    },
+                    "500": {
+                        "description": "Internal server error. Indicates a problem with processing the request."
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Subject": {
+                "type": "object",
+                "description": "Drug compound information (subject of the association).",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Compact identifier (CHEBI CURIE) for the drug."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the drug compound."
+                    }
+                }
+            },
+            "Object": {
+                "type": "object",
+                "description": "Disease or phenotype information (object of the association).",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Compact identifier (MONDO CURIE) for the disease."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the disease or phenotype."
+                    }
+                }
+            },
+            "ResultItem": {
+                "type": "object",
+                "description": "Record representing one drug-disease association.",
+                "properties": {
+                    "subject": {
+                        "$ref": "#/components/schemas/Subject"
+                    },
+                    "object": {
+                        "$ref": "#/components/schemas/Object"
+                    },
+                    "relationship": {
+                        "type": "string",
+                        "description": "Biolink relationship between the drug and the disease."
+                    },
+                    "pubmed_ids": {
+                        "type": "array",
+                        "description": "List of PubMed IDs supporting the relationship.",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

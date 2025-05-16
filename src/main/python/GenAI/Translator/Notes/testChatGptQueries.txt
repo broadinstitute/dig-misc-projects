@@ -1,6 +1,15 @@
 
 
 
+============================================================================================
+what are common biological pathways between type 2 diabetes and alzheimer's disease?
+
+
+
+============================================================================================
+What drugs are associated with treating melanoma, and for each drug, use the rest service to tell me what genes are impacted
+
+
 
 ============================================================================================
 using both association of biological process association to disease and gene association to disease, indicate how the PPARG gene impacts type 2 diabetes and what tissues the gene is expressed in. 
