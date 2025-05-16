@@ -80,7 +80,7 @@
                                                     "relationship": {
                                                         "type": "string",
                                                         "description": "Biolink model relationship between the tissue and the gene.",
-                                                        "example": "biolink:expresses"
+                                                        "example": "biolink:expressed_in"
                                                     },
                                                     "level": {
                                                         "type": "string",
@@ -181,7 +181,7 @@
                                                     },
                                                     "relationship": {
                                                         "type": "string",
-                                                        "description": "Biolink model relationship between the gene and the tossue.",
+                                                        "description": "Biolink model relationship between the gene and the tissue.",
                                                         "example": "biolink:expresses"
                                                     },
                                                     "level": {
@@ -218,7 +218,194 @@
                     }
                 }
             }
+        },
+        "/get_drug_for_disease": {
+            "get": {
+                "operationId": "getDrugForDisease",
+                "summary": "Retrieve drugs associated with a given disease",
+                "description": "Returns a list of drug compounds (subjects) that are associated with a specified disease (object).\nThe relationships between drugs and diseases are annotated using Biolink model terms.",
+                "parameters": [
+                    {
+                        "name": "input",
+                        "in": "query",
+                        "description": "The disease name or condition for which to find associated drug treatments.\nExample: \"drug-induced liver injury\".",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with drug-disease associations.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "array",
+                                            "description": "List of drug-disease association records.",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "subject": {
+                                                        "type": "object",
+                                                        "description": "Information about the drug compound associated with the disease.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the drug entity.\nTypically a CHEBI identifier.",
+                                                                "example": "CHEBI:27560"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Common name of the drug compound.",
+                                                                "example": "boron"
+                                                            }
+                                                        }
+                                                    },
+                                                    "object": {
+                                                        "type": "object",
+                                                        "description": "Information about the disease or phenotype being treated.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the disease entity.\nTypically a MONDO ontology identifier.",
+                                                                "example": "MONDO:0005359"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Human-readable disease or phenotype name.",
+                                                                "example": "drug-induced liver injury"
+                                                            }
+                                                        }
+                                                    },
+                                                    "relationship": {
+                                                        "type": "string",
+                                                        "description": "Biolink model relationship describing the connection between the drug and the disease.\nExample: \"biolink:treats\" indicates that the drug treats the disease.",
+                                                        "example": "biolink:treats"
+                                                    },
+                                                    "pubmed_ids": {
+                                                        "type": "array",
+                                                        "description": "List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "description": "PubMed ID for a scientific publication.",
+                                                            "example": "PMID:30997025"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input parameter. Ensure the \"input\" query parameter is provided and correctly formatted."
+                    },
+                    "500": {
+                        "description": "Internal server error. Indicates a problem with processing the request."
+                    }
+                }
+            }
+        },
+        "/get_disease_for_drug": {
+            "get": {
+                "operationId": "getDiseaseForDrug",
+                "summary": "Retrieve diseases associated with a given drug",
+                "description": "Returns a list of diseases (subjects) that are associated with a specified drug compound (object).\nThe relationships between diseases and drug compounds are annotated using Biolink model terms.",
+                "parameters": [
+                    {
+                        "name": "input",
+                        "in": "query",
+                        "description": "The drug compound name or condition for which to find associated drug treatments.\nExample: \"boron\".",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with disease-drug associations.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "array",
+                                            "description": "List of disease-drug association records.",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "object": {
+                                                        "type": "object",
+                                                        "description": "Information about the drug compound associated with the disease.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the drug entity.\nTypically a CHEBI identifier.",
+                                                                "example": "CHEBI:27560"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Common name of the drug compound.",
+                                                                "example": "boron"
+                                                            }
+                                                        }
+                                                    },
+                                                    "subject": {
+                                                        "type": "object",
+                                                        "description": "Information about the disease or phenotype being treated.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the disease entity.\nTypically a MONDO ontology identifier.",
+                                                                "example": "MONDO:0005359"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Human-readable disease or phenotype name.",
+                                                                "example": "drug-induced liver injury"
+                                                            }
+                                                        }
+                                                    },
+                                                    "relationship": {
+                                                        "type": "string",
+                                                        "description": "Biolink model relationship describing the connection between the disease and the drug.\nExample: \"biolink:treated\" indicates that the disease is treated by the drug compound.",
+                                                        "example": "biolink:treated"
+                                                    },
+                                                    "pubmed_ids": {
+                                                        "type": "array",
+                                                        "description": "List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "description": "PubMed ID for a scientific publication.",
+                                                            "example": "PMID:30997025"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input parameter. Ensure the \"input\" query parameter is provided and correctly formatted."
+                    },
+                    "500": {
+                        "description": "Internal server error. Indicates a problem with processing the request."
+                    }
+                }
+            }
         }
+
     },
     "components": {
         "schemas": {
