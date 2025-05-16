@@ -106,6 +106,20 @@ def get_pathway_for_disease(request: Request, input: str = Query(..., descriptio
     return JSONResponse(content={'result': list_result})
 
 
+@app.get("/get_disease_for_pathway")
+def get_disease_for_pathway(request: Request, input: str = Query(..., description="pathway")):
+    # call the method
+    # reversed_str = input[::-1]
+    print("for: {}, got input: {}".format(request.url.path, input))
+    list_result = query_trapi_list_for_string(list_endpoint_url=cutils.LIST_URL_ALL, entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_PATHWAY,
+                                         list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_DISEASE, 
+                                         list_target_types=cutils.LIST_ENTITIES_PATHWAY, 
+                                         field_to_sort=cutils.KEY_P_VALUE, descending=False, log=False)    
+
+    # return JSONResponse(content={"original": input, "reversed": reversed_str})
+    return JSONResponse(content={'result': list_result})
+
+
 @app.get("/get_drug_for_gene")
 def get_drug_for_gene(request: Request, input: str = Query(..., description="gene")):
     # call the method
