@@ -261,3 +261,17 @@ def get_common_pathways(request: Request, input: str = Query(..., description="g
     # return JSONResponse(content={"original": input, "reversed": reversed_str})
     return JSONResponse(content=result)
 
+
+@app.get("/get_cypher_query")
+def get_common_pathways(request: Request, input: str = Query(..., description="query")):
+    # cypher query
+    query = input
+
+    # log
+    # print("running cypher query: \n{}".format(query))
+
+    # call the method
+    result = cyutils.run_cypher(cypher_query=query, log=True)
+
+    # return JSONResponse(content={"original": input, "reversed": reversed_str})
+    return JSONResponse(content=result)

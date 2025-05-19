@@ -1,0 +1,90 @@
+
+
+- node types
+{
+    "data": [
+        {
+            "label": "Trait"
+        },
+        {
+            "label": "GeneSet"
+        },
+        {
+            "label": "Factor"
+        },
+        {
+            "label": "Gene"
+        }
+    ],
+    "message": "all good"
+}
+
+- node properties
+{
+    "data": [
+        {
+            "Label": ":`Factor`",
+            "Properties": [
+                "id",
+                "label"
+            ]
+        },
+        {
+            "Label": ":`GeneSet`",
+            "Properties": [
+                "id"
+            ]
+        },
+        {
+            "Label": ":`Gene`",
+            "Properties": [
+                "id"
+            ]
+        },
+        {
+            "Label": ":`Trait`",
+            "Properties": [
+                "id",
+                "label"
+            ]
+        }
+    ],
+    "message": "all good"
+}
+
+- edges and propertues
+
+
+
+
+node counts:
+{
+    "data": [
+        {
+            "label": "Factor",
+            "count": 39228
+        },
+        {
+            "label": "Gene",
+            "count": 22572
+        },
+        {
+            "label": "GeneSet",
+            "count": 112945
+        },
+        {
+            "label": "Trait",
+            "count": 10423
+        }
+    ],
+    "message": "all good"
+}
+
+edge counts:
+relType	count
+"FACTOR_GENE"	33660962
+"FACTOR_GENE_SET"	5089119
+"TRAIT_FACTOR"	39228
+"TRAIT_GENE"	1299086
+"TRAIT_GENE_SET"	1787999
+

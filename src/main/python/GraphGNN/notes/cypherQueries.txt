@@ -1,0 +1,25 @@
+
+
+
+- node types and properties
+
+
+
+- edge types and properties
+MATCH ()-[r]->()
+WITH type(r) AS relationshipType, collect(DISTINCT keys(r)) AS propertyKeys
+UNWIND propertyKeys AS flattened
+WITH relationshipType, collect(DISTINCT flattened) AS Properties
+RETURN relationshipType AS Label, Properties
+ORDER BY Label
+
+
+- count nodes by type
+MATCH (n)
+WITH labels(n) AS nodeLabels, count(n) AS nodeCount
+UNWIND nodeLabels AS label
+WITH label, sum(nodeCount) AS count
+RETURN label, count
+ORDER BY label
+
+
