@@ -910,6 +910,192 @@
                 }
             }
         },
+        "/get_drug_for_pathway": {
+            "get": {
+                "operationId": "getDrugForPathway",
+                "summary": "Retrieve drugs associated with a given biological process",
+                "description": "Returns a list of drug compounds (subjects) that are associated with a specified biological process (object).\nThe relationships between drugs and biological processes are annotated using Biolink model terms.",
+                "parameters": [
+                    {
+                        "name": "input",
+                        "in": "query",
+                        "description": "The biological process name for which to find associated drug associations.\nExample: \"HIF-1 signaling pathway\".",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with drug-biological process associations.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "array",
+                                            "description": "List of drug-biological process association records.",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "subject": {
+                                                        "type": "object",
+                                                        "description": "Information about the drug compound associated with the biological process.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the drug entity.\nTypically a CHEBI identifier.",
+                                                                "example": "CHEBI:27560"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Common name of the drug compound.",
+                                                                "example": "boron"
+                                                            }
+                                                        }
+                                                    },
+                                                    "object": {
+                                                        "type": "object",
+                                                        "description": "Information about the biological process associated with the disease.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the biological process entity.\nTypically a GO identifier.",
+                                                                "example": "GO:0001637"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Common name of the biological process.",
+                                                                "example": "Gomf - G Protein Coupled Chemoattractant Receptor Activity"
+                                                            }
+                                                        }
+                                                    },
+                                                    "relationship": {
+                                                        "type": "string",
+                                                        "description": "Biolink model relationship describing the connection between the drug and the biological process.\nExample: \"biolink:affects\" indicates that the drug affects the gene.",
+                                                        "example": "biolink:affects"
+                                                    },
+                                                    "pubmed_ids": {
+                                                        "type": "array",
+                                                        "description": "List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "description": "PubMed ID for a scientific publication.",
+                                                            "example": "PMID:30997025"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input parameter. Ensure the \"input\" query parameter is provided and correctly formatted."
+                    },
+                    "500": {
+                        "description": "Internal server error. Indicates a problem with processing the request."
+                    }
+                }
+            }
+        },
+        "/get_pathway_for_drug": {
+            "get": {
+                "operationId": "getPathwayForDrug",
+                "summary": "Retrieve biological processes associated with a given drug",
+                "description": "Returns a list of biological processes (subjects) that are associated with a specified drug compound (object).\nThe relationships between biological processes and drugs are annotated using Biolink model terms.",
+                "parameters": [
+                    {
+                        "name": "input",
+                        "in": "query",
+                        "description": "The drug compound name for which to find the biological processes affected\nExample: \"imiquimod\".",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with drug-biological process associations.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "array",
+                                            "description": "List of drug-biological process association records.",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "object": {
+                                                        "type": "object",
+                                                        "description": "Information about the drug compound associated with the biological process.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the drug entity.\nTypically a CHEBI identifier.",
+                                                                "example": "CHEBI:27560"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Common name of the drug compound.",
+                                                                "example": "boron"
+                                                            }
+                                                        }
+                                                    },
+                                                    "subject": {
+                                                        "type": "object",
+                                                        "description": "Information about the biological process associated with the disease.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the biological process entity.\nTypically a GO identifier.",
+                                                                "example": "GO:0001637"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Common name of the biological process.",
+                                                                "example": "Gomf - G Protein Coupled Chemoattractant Receptor Activity"
+                                                            }
+                                                        }
+                                                    },
+                                                    "relationship": {
+                                                        "type": "string",
+                                                        "description": "Biolink model relationship describing the connection between the drug and the biological process.\nExample: \"biolink:affects\" indicates that the drug affects the gene.",
+                                                        "example": "biolink:affected_by"
+                                                    },
+                                                    "pubmed_ids": {
+                                                        "type": "array",
+                                                        "description": "List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "description": "PubMed ID for a scientific publication.",
+                                                            "example": "PMID:30997025"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input parameter. Ensure the \"input\" query parameter is provided and correctly formatted."
+                    },
+                    "500": {
+                        "description": "Internal server error. Indicates a problem with processing the request."
+                    }
+                }
+            }
+        },
         "/get_drug_for_gene": {
             "get": {
                 "operationId": "getDrugForGene",

@@ -20,8 +20,8 @@ NEO4J_PASSWORD = os.getenv('NEO4J_PASSWORD')
 # Define node and edge types based on your schema
 NODE_TYPES = ['Factor', 'GeneSet', 'Gene', 'Trait']
 EDGE_TYPES = [
-    ('Factor', 'FACTOR_GENE', 'Gene'),
-    ('Factor', 'FACTOR_GENE_SET', 'GeneSet'),
+    # ('Factor', 'FACTOR_GENE', 'Gene'),
+    # ('Factor', 'FACTOR_GENE_SET', 'GeneSet'),
     ('Trait', 'TRAIT_FACTOR', 'Factor'),
     ('Trait', 'TRAIT_GENE', 'Gene'),
     ('Trait', 'TRAIT_GENE_SET', 'GeneSet')
@@ -122,7 +122,7 @@ def process_edges(edge_df, src_mapping, dst_mapping, weight_col=None):
     
     return edge_index, edge_attr
 
-def extract_and_save_data(output_dir, uri=NEO4J_URI, username=NEO4J_USER, password=NEO4J_PASSWORD):
+def extract_and_save_data(output_dir, uri=NEO4J_URI, username=NEO4J_USER, password=NEO4J_PASSWORD, do_nodes=False, do_edges=False):
     """Extract data from Neo4j and save to disk"""
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
@@ -140,77 +140,80 @@ def extract_and_save_data(output_dir, uri=NEO4J_URI, username=NEO4J_USER, passwo
     nodes = {}
     node_mappings = {}
     
-    for node_type in NODE_TYPES:
-        print(f"Extracting {node_type} nodes of size: {len(node_type)}")
-        nodes[node_type] = extractor.extract_nodes(node_type)
-        
-        # Save raw node data
-        nodes[node_type].to_csv(os.path.join(output_dir, f"{node_type}_nodes.csv"), index=False)
-        
-        # # Process node features
-        # if node_type == 'Factor' or node_type == 'Trait':
-        #     # For nodes with a label property
-        #     nodes[node_type]['feat'], node_mappings[node_type] = process_nodes(
-        #         nodes[node_type], feature_cols=['label']
-        #     )
-        # else:
-        #     # For nodes without specific properties
-        #     nodes[node_type]['feat'], node_mappings[node_type] = process_nodes(
-        #         nodes[node_type]
-        #     )
-        
-        # # Save processed node features
-        # torch.save(nodes[node_type]['feat'], os.path.join(output_dir, f"{node_type}_features.pt"))
-        
-        # # Save node mapping
-        # with open(os.path.join(output_dir, f"{node_type}_mapping.pkl"), 'wb') as f:
-        #     pickle.dump(node_mappings[node_type], f)
+    if do_nodes:
+        for node_type in NODE_TYPES:
+            print(f"Extracting {node_type} nodes of size: {len(node_type)}")
+            nodes[node_type] = extractor.extract_nodes(node_type)
+            
+            # Save raw node data
+            nodes[node_type].to_csv(os.path.join(output_dir, f"{node_type}_nodes.csv"), index=False)
+            
+            # # Process node features
+            # if node_type == 'Factor' or node_type == 'Trait':
+            #     # For nodes with a label property
+            #     nodes[node_type]['feat'], node_mappings[node_type] = process_nodes(
+            #         nodes[node_type], feature_cols=['label']
+            #     )
+            # else:
+            #     # For nodes without specific properties
+            #     nodes[node_type]['feat'], node_mappings[node_type] = process_nodes(
+            #         nodes[node_type]
+            #     )
+            
+            # # Save processed node features
+            # torch.save(nodes[node_type]['feat'], os.path.join(output_dir, f"{node_type}_features.pt"))
+            
+            # # Save node mapping
+            # with open(os.path.join(output_dir, f"{node_type}_mapping.pkl"), 'wb') as f:
+            #     pickle.dump(node_mappings[node_type], f)
+
+
+    if do_edges:
+        # Extract edges and save to disk
+        edges = {}
+        for src_type, edge_type, dst_type in EDGE_TYPES:
+            edge_key = (src_type, edge_type, dst_type)
+            print(f"Extracting {edge_type} edges from {src_type} to {dst_type}...")
+            
+            # Extract edges
+            edges[edge_key] = extractor.extract_edges(src_type, edge_type, dst_type)
+            print("got list of size: {}".format(len(edges[edge_key])))
+
+            # Save raw edge data
+            edges[edge_key].to_csv(os.path.join(output_dir, f"{src_type}_{edge_type}_{dst_type}_edges.csv"), index=False)
+            
+            # # Determine appropriate weight column
+            # if edge_type == 'FACTOR_GENE' or edge_type == 'FACTOR_GENE_SET' or edge_type == 'TRAIT_FACTOR':
+            #     weight_col = 'weight'
+            # elif edge_type == 'TRAIT_GENE':
+            #     weight_col = 'combined'  # or 'prior', depending on your needs
+            # elif edge_type == 'TRAIT_GENE_SET':
+            #     # weight_col = 'beta'  # or 'beta_uncorrected', depending on your needs
+            #     weight_col = 'beta_uncorrected'  # or 'beta_uncorrected', depending on your needs
+            # else:
+            #     weight_col = None
+            
+            # # Process edges
+            # edge_index, edge_attr = process_edges(
+            #     edges[edge_key],
+            #     node_mappings[src_type],
+            #     node_mappings[dst_type],
+            #     weight_col
+            # )
+            
+            # # Save processed edge data
+            # torch.save(edge_index, os.path.join(output_dir, f"{src_type}_{edge_type}_{dst_type}_edge_index.pt"))
+            # if edge_attr is not None:
+            #     torch.save(edge_attr, os.path.join(output_dir, f"{src_type}_{edge_type}_{dst_type}_edge_attr.pt"))
     
-    # Extract edges and save to disk
-    edges = {}
-    for src_type, edge_type, dst_type in EDGE_TYPES:
-        edge_key = (src_type, edge_type, dst_type)
-        print(f"Extracting {edge_type} edges from {src_type} to {dst_type}...")
+        # Save metadata about the graph
+        metadata = {
+            'node_types': NODE_TYPES,
+            'edge_types': EDGE_TYPES
+        }
         
-        # Extract edges
-        edges[edge_key] = extractor.extract_edges(src_type, edge_type, dst_type)
-        print("got list of size: {}".format(len(edges[edge_key])))
-                
-        # Save raw edge data
-        edges[edge_key].to_csv(os.path.join(output_dir, f"{src_type}_{edge_type}_{dst_type}_edges.csv"), index=False)
-        
-        # # Determine appropriate weight column
-        # if edge_type == 'FACTOR_GENE' or edge_type == 'FACTOR_GENE_SET' or edge_type == 'TRAIT_FACTOR':
-        #     weight_col = 'weight'
-        # elif edge_type == 'TRAIT_GENE':
-        #     weight_col = 'combined'  # or 'prior', depending on your needs
-        # elif edge_type == 'TRAIT_GENE_SET':
-        #     # weight_col = 'beta'  # or 'beta_uncorrected', depending on your needs
-        #     weight_col = 'beta_uncorrected'  # or 'beta_uncorrected', depending on your needs
-        # else:
-        #     weight_col = None
-        
-        # # Process edges
-        # edge_index, edge_attr = process_edges(
-        #     edges[edge_key],
-        #     node_mappings[src_type],
-        #     node_mappings[dst_type],
-        #     weight_col
-        # )
-        
-        # # Save processed edge data
-        # torch.save(edge_index, os.path.join(output_dir, f"{src_type}_{edge_type}_{dst_type}_edge_index.pt"))
-        # if edge_attr is not None:
-        #     torch.save(edge_attr, os.path.join(output_dir, f"{src_type}_{edge_type}_{dst_type}_edge_attr.pt"))
-    
-    # Save metadata about the graph
-    metadata = {
-        'node_types': NODE_TYPES,
-        'edge_types': EDGE_TYPES
-    }
-    
-    with open(os.path.join(output_dir, 'metadata.pkl'), 'wb') as f:
-        pickle.dump(metadata, f)
+        with open(os.path.join(output_dir, 'metadata.pkl'), 'wb') as f:
+            pickle.dump(metadata, f)
     
     # Close Neo4j connection
     extractor.close()
@@ -218,4 +221,4 @@ def extract_and_save_data(output_dir, uri=NEO4J_URI, username=NEO4J_USER, passwo
     print(f"Data extraction complete. Files saved to {output_dir}")
 
 if __name__ == "__main__":
-    extract_and_save_data(output_dir=DIR_DATA)
+    extract_and_save_data(output_dir=DIR_DATA, do_edges=True)

@@ -245,6 +245,10 @@ def query_trapi_list_for_string(list_endpoint_url, entity_name, list_ontologies,
     # get the list of curies
     list_curies = get_curies(entity_name=entity_name, list_ontologies=list_ontologies, log=log)
 
+    # log
+    if True:
+        print("for list of curies for: {} of {}".format(entity_name, list_curies))
+
     if len(list_curies) > 0:
         # loop through trapi URLS
         for url_trapi in list_endpoint_url:
