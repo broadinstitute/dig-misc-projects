@@ -20,6 +20,8 @@ KEY_OBJECT_PROPS = "object_properties"
 
 KEY_RELATIONSHIP = "relationship"
 KEY_RELATIONSHIP_PROPS = "relationship_properties"
+KEY_PRIMARY_SOURCE = "primary_knowledge_source"
+KEY_TRAPI_SOURCE = "knowledge_provider"
 
 
 # TRAPI KEYS
@@ -35,6 +37,10 @@ TRAPI_KEY_ATTRIBUTE_TYPE_ID = "attribute_type_id"
 TRAPI_KEY_ORIGINAL_NAME = "original_attribute_name"
 TRAPI_KEY_LEVEL = "level"
 TRAPI_KEY_RELIABILITY = "reliability"
+TRAPI_KEY_SOURCES = "sources"
+TRAPI_VALUE_PRIMARY_SOURCE = "primary_knowledge_source"
+TRAPI_KEY_ATTR_RESOURCE_ROLE = "resource_role"
+TRAPI_KEY_ATTR_RESOURCE_ID = "resource_id"
 
 
 # URLS
@@ -54,11 +60,30 @@ URL_CONNECTIONS = "https://chp-api.transltr.io" # only genes to tissue
 URL_SERVICE_PROVIDER = "https://bte.transltr.io/v1/team/Service%20Provider" # not working
 
 
+# INFORES
+INFORES_MOLEPRO = "infores:molepro"
+INFORES_GENETICSKP = "infores:genetics-data-provider"
+INFORES_AUTOMAT = "infores:automat-pharos"
+INFORES_SPOKE = "infores:spoke"
+INFORES_FDA = "infores:multiomics-drugapprovals"
+INFORES_RTX_KG2 = "infores:rtx-kg2"
+INFORES_MULTIOMICS = "infores:multiomics-multiomics"
+INFORES_MICROBIOME = "infores:multiomics-microbiome"
+INFORES_COHD = "infores:cohd"
+INFORES_ROBOKOP = "infores:automat-robokop"
+INFORES_CLINICAL = "infores:multiomics-clinicaltrials"
+
 # URL LISTS
 LIST_URL_ALL = [
     URL_MOLEPRO, URL_GENETICSKP, URL_AUTOMAT, URL_SPOKE, URL_FDA, 
     URL_RTX_KG2, URL_MULTIOMICS, URL_MICROBIOME, URL_CLINICAL, URL_COHD
 ]
+
+MAP_URL_ALL = {
+    INFORES_MOLEPRO: URL_MOLEPRO, INFORES_GENETICSKP: URL_GENETICSKP, INFORES_AUTOMAT: URL_AUTOMAT, INFORES_SPOKE: URL_SPOKE, INFORES_FDA: URL_FDA, 
+    INFORES_RTX_KG2: URL_RTX_KG2, INFORES_MULTIOMICS: URL_MULTIOMICS, INFORES_MICROBIOME: URL_MICROBIOME, INFORES_CLINICAL: URL_CLINICAL, INFORES_COHD: URL_COHD
+}
+
 
 # TODO - drug/disease
 LIST_URL_DRUG_DISEASE = [URL_MOLEPRO, URL_AUTOMAT, URL_FDA, URL_RTX_KG2]

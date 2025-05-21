@@ -201,6 +201,12 @@ def translate_trapi_results(map_trapi, num_limit=100, sort=True, descending=True
                         if attribute.get(cutils.TRAPI_KEY_ORIGINAL_NAME, "") == cutils.TRAPI_KEY_RELIABILITY:
                             reliability = attribute.get(cutils.TRAPI_KEY_VALUE, "")
 
+                    # get the primary source
+                    for source in edge_data.get(cutils.TRAPI_KEY_SOURCES, []):
+                        if source.get(cutils.TRAPI_KEY_ATTR_RESOURCE_ROLE, "") == cutils.TRAPI_VALUE_PRIMARY_SOURCE:
+                            primarySource = source.get(cutils.TRAPI_KEY_ATTR_RESOURCE_ID, None)
+
+
                     predicate = edge_data.get(cutils.TRAPI_KEY_PREDICATE)
                     edge_result = {cutils.KEY_SUBJECT: source, cutils.KEY_OBJECT: target, cutils.KEY_RELATIONSHIP: predicate}
 
@@ -218,6 +224,11 @@ def translate_trapi_results(map_trapi, num_limit=100, sort=True, descending=True
                         edge_result[cutils.KEY_LEVEL] = level
                         edge_result[cutils.KEY_RELIABILITY] = reliability
 
+                    if primarySource:
+                        edge_result[cutils.KEY_PRIMARY_SOURCE] = primarySource
+
+                    # if endpont_infores:
+                    #     edge_result[cutils.KEY_TRAPI_SOURCE] = endpont_infores
 
                     # add edge
                     extracted_edges.append(edge_result)
