@@ -176,6 +176,7 @@ def translate_trapi_results(map_trapi, endpont_infores=None, num_limit=100, sort
                 pValue = None
                 level = None
                 reliability = None
+                primarySource = {}
 
                 source_id = edge_data.get(cutils.TRAPI_KEY_SUBJECT)
                 target_id = edge_data.get(cutils.TRAPI_KEY_OBJECT)
@@ -202,9 +203,9 @@ def translate_trapi_results(map_trapi, endpont_infores=None, num_limit=100, sort
                             reliability = attribute.get(cutils.TRAPI_KEY_VALUE, "")
 
                     # get the primary source
-                    for source in edge_data.get(cutils.TRAPI_KEY_SOURCES, []):
-                        if source.get(cutils.TRAPI_KEY_ATTR_RESOURCE_ROLE, "") == cutils.TRAPI_VALUE_PRIMARY_SOURCE:
-                            primarySource = source.get(cutils.TRAPI_KEY_ATTR_RESOURCE_ID, None)
+                    for knowledgeSource in edge_data.get(cutils.TRAPI_KEY_SOURCES, []):
+                        if knowledgeSource.get(cutils.TRAPI_KEY_ATTR_RESOURCE_ROLE, "") == cutils.TRAPI_VALUE_PRIMARY_SOURCE:
+                            primarySource = knowledgeSource.get(cutils.TRAPI_KEY_ATTR_RESOURCE_ID, None)
 
 
                     predicate = edge_data.get(cutils.TRAPI_KEY_PREDICATE)
