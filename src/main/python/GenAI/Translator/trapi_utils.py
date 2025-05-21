@@ -149,7 +149,7 @@ def query_trapi_for_string(endpoint_url, entity_name, list_ontologies, list_pred
     return list_result
 
 
-def translate_trapi_results(map_trapi, num_limit=100, sort=True, descending=True, field_to_sort=None, log=False):
+def translate_trapi_results(map_trapi, endpont_infores=None, num_limit=100, sort=True, descending=True, field_to_sort=None, log=False):
     '''
     will translate trapui result to more condensed format
     '''
@@ -227,8 +227,8 @@ def translate_trapi_results(map_trapi, num_limit=100, sort=True, descending=True
                     if primarySource:
                         edge_result[cutils.KEY_PRIMARY_SOURCE] = primarySource
 
-                    # if endpont_infores:
-                    #     edge_result[cutils.KEY_TRAPI_SOURCE] = endpont_infores
+                    if endpont_infores:
+                        edge_result[cutils.KEY_TRAPI_SOURCE] = endpont_infores
 
                     # add edge
                     extracted_edges.append(edge_result)
@@ -290,7 +290,74 @@ def query_trapi_list_for_string(list_endpoint_url, entity_name, list_ontologies,
     # return
     return list_total_results
 
+
+def query_trapi_map_for_string(map_endpoint_url, entity_name, list_ontologies, list_predicates=["biolink:related_to"], list_source_types=[], list_target_types=[], 
+                           sort=True, descending=False, field_to_sort=None, log=False):
+    '''
+    query name resolver first for curies, then the service itself an translate
+    '''
+    # initialize
+    map_trapi_response = {}
+    list_result = []
+    list_curies = []
+    list_total_results = []
+
+    # get the list of curies
+    list_curies = get_curies(entity_name=entity_name, list_ontologies=list_ontologies, log=log)
+
+    # log
+    if True:
+        print("for list of curies for: {} of {}".format(entity_name, list_curies))
+
+    if len(list_curies) > 0:
+        # loop through trapi URLS
+        for infores_trapi, url_trapi in map_endpoint_url.items():
+            # log
+            print("querying infores: {} with endpoint: {}".format(infores_trapi, url_trapi))
+
+            # do the trapi query
+            map_trapi_response = query_trapi_rest_service(endpoint_url=url_trapi, list_target=list_curies, list_predicates=list_predicates, 
+                                                        list_source_types=list_source_types, list_target_types=list_target_types, log=False)
+            
+            # log
+            if log:
+                print("translating trapi result: \n{}".format(json.dumps(map_trapi_response, indent=2)))
+            
+            # translate
+            list_result = translate_trapi_results(map_trapi=map_trapi_response, sort=sort, descending=descending, field_to_sort=field_to_sort, endpont_infores=infores_trapi, log=log)
+
+            # log
+            print("got num result: {} for: {}".format(len(list_result), infores_trapi))
+
+            # add to results
+            list_total_results = list_total_results + list_result
+
     
+    # log total results returns
+    print("returning for curies: {}, total results: {}".format(list_curies, len(list_total_results)))
+
+    # return
+    return list_total_results
+
+
+def query_all_trapi_for_string(entity_name, list_ontologies, list_predicates=["biolink:related_to"], list_source_types=[], list_target_types=[], 
+                           sort=True, descending=False, field_to_sort=None, log=False):
+    '''
+    query name resolver first for curies, then the service itself an translate
+    '''
+    # initialize
+    map_trapi_all = cutils.MAP_URL_ALL
+
+    # TODO - filter KP map by query triple
+    
+    # get the results
+    list_total_results = query_trapi_map_for_string(map_endpoint_url=map_trapi_all, entity_name=entity_name, list_ontologies=list_ontologies, list_predicates=list_predicates, 
+                                                    list_source_types=list_source_types,
+                                                    list_target_types=list_target_types, sort=sort, descending=descending, field_to_sort=field_to_sort, log=log)
+
+    # return
+    return list_total_results
+
 
 # main
 if __name__ == "__main__":
