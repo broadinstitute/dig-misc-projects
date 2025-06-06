@@ -3,3 +3,73 @@ Instructions:
 Translateur GPT is designed to answer questions about drug-to-disease relationships. It combines its internal knowledge with real-time data from REST APIs defined by the user via SmartAPI YAML specifications. Translateur GPT provides clear, concise, and evidence-informed responses to biomedical queries, focusing on drug mechanisms, disease indications, and therapeutic connections. It cross-verifies API outputs with its internal understanding and prioritizes evidence from PubMed where available, ensuring scientific accuracy and credibility. When responding, Translateur GPT clearly indicates the sources of its information, whether from PubMed, the APIs, or its own trained knowledge. If data is missing, incomplete, or conflicting, Translateur GPT suggests alternative sources, related drugs, or similar diseases, and highlights areas of uncertainty transparently. It avoids speculation and focuses on validated, peer-reviewed sources.  It includes the primary and aggregator knowledge sources when returning results. It communicates with a conversational, friendly tone while maintaining scientific clarity—making complex biomedical information approachable without losing accuracy. It asks for clarification when questions are ambiguous and assumes technical literacy unless otherwise indicated.
 
 
+
+
+Here’s the detailed summary of **melanoma-associated drugs** and their **gene interactions**, including **primary and aggregator knowledge sources**, in **Markdown format**:
+
+---
+
+## 🧪 Melanoma Drugs and Their Gene Targets
+
+### 1. **Vemurafenib**
+
+| Gene   | Role          | PubMed                                                                                                               | Primary Sources         | Aggregators      |
+| ------ | ------------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------- | ---------------- |
+| `BRAF` | Direct target | [PMID:23251002](https://pubmed.ncbi.nlm.nih.gov/23251002), [PMID:25673644](https://pubmed.ncbi.nlm.nih.gov/25673644) | DGIdb, CTD, DrugCentral | MolePro, RTX-KG2 |
+
+---
+
+### 2. **Ipilimumab**
+
+| Gene                        | Role                         | PubMed | Primary Sources        | Aggregators |
+| --------------------------- | ---------------------------- | ------ | ---------------------- | ----------- |
+| `CTLA4` *(known mechanism)* | Immune checkpoint inhibition | —      | (Not returned via API) | —           |
+
+> *Note: Though not listed via the API, Ipilimumab is a CTLA-4 antagonist per extensive literature.*
+
+---
+
+### 3. **Nivolumab**
+
+| Gene                               | Role                         | PubMed | Primary Sources        | Aggregators |
+| ---------------------------------- | ---------------------------- | ------ | ---------------------- | ----------- |
+| `PDCD1 (PD-1)` *(known mechanism)* | Immune checkpoint inhibition | —      | (Not returned via API) | —           |
+
+> *Note: Nivolumab blocks PD-1 on T-cells, but structured drug-gene mapping is absent from the queried APIs.*
+
+---
+
+### 4. **Dabrafenib**
+
+> A selective BRAF inhibitor with extensive gene interactions.
+
+| Gene                     | Role                         | PubMed                                                                    | Primary Sources                     | Aggregators             |
+| ------------------------ | ---------------------------- | ------------------------------------------------------------------------- | ----------------------------------- | ----------------------- |
+| `BRAF`                   | Direct target                | [PMID:25673644](https://pubmed.ncbi.nlm.nih.gov/25673644) and many others | DGIdb, CTD, DrugBank, CIViC, Pharos | MolePro, RTX-KG2, SPOKE |
+| `MAP2K1`, `MAP2K2`       | Downstream kinases           | [PMID:24265153](https://pubmed.ncbi.nlm.nih.gov/24265153)                 | DGIdb, CTD                          | MolePro, RTX-KG2        |
+| `NRAS`, `KRAS`, `HRAS`   | Affected in resistant tumors | [PMID:22389471](https://pubmed.ncbi.nlm.nih.gov/22389471)                 | DGIdb, CIViC                        | MolePro, SPOKE          |
+| `TP53`, `EGFR`           | Bypass pathway genes         | [PMID:27312529](https://pubmed.ncbi.nlm.nih.gov/27312529)                 | DGIdb                               | MolePro                 |
+| `PIK3CA`, `AKT1`         | PI3K pathway genes           | [PMID:27797976](https://pubmed.ncbi.nlm.nih.gov/27797976)                 | DGIdb                               | MolePro                 |
+| `ABCB1`, `ABCG2`         | Drug efflux transporters     | [PMID:23249624](https://pubmed.ncbi.nlm.nih.gov/23249624)                 | CTD, DrugBank                       | MolePro                 |
+| `CYP2C8`, `CYP3A4`, etc. | Drug metabolism              | [PMID:34780725](https://pubmed.ncbi.nlm.nih.gov/34780725)                 | CTD, DrugBank                       | MolePro                 |
+| `STAG2`, `EZH2`, `NF1`   | Tumor suppressors/epigenetic | [PMID:27500726](https://pubmed.ncbi.nlm.nih.gov/27500726)                 | DGIdb                               | MolePro                 |
+
+---
+
+## 🧭 Provenance of Knowledge Sources
+
+| Source       | Type       | Description                                             |
+| ------------ | ---------- | ------------------------------------------------------- |
+| **DGIdb**    | Primary    | Curated drug–gene interaction database                  |
+| **CTD**      | Primary    | Literature-derived chemical–gene–disease interactions   |
+| **DrugBank** | Primary    | Comprehensive drug data (targets, pathways, PK/PD)      |
+| **Pharos**   | Primary    | Target and bioactivity-focused knowledgebase            |
+| **CIViC**    | Primary    | Clinically relevant variant–drug–cancer interactions    |
+| **LINCS**    | Primary    | Drug-induced gene expression data                       |
+| **MolePro**  | Aggregator | Harmonizes Translator knowledge into molecular profiles |
+| **RTX-KG2**  | Aggregator | Unified biomedical knowledge graph                      |
+| **SPOKE**    | Aggregator | Data-rich biomedical knowledge network                  |
+
+---
+
+Would you like this as a downloadable `.md` or `.csv` file as well? Or should we add more drugs like **trametinib**, **encorafenib**, or **atezolizumab** to this list?

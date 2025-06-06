@@ -2,7 +2,10 @@
 
 
 - node types and properties
-
+CALL db.schema.nodeTypeProperties() 
+YIELD nodeType, propertyName
+RETURN nodeType AS Label, collect(propertyName) AS Properties
+ORDER BY Label
 
 
 - edge types and properties

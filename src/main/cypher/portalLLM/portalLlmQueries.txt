@@ -1,0 +1,13 @@
+
+
+
+
+MATCH (t1:Trait {id: 'T2D'})-[:TRAIT_FACTOR]-(f1:Factor)-[:FACTOR_GENE]-(g:Gene)-[:FACTOR_GENE]-(f2:Factor)-[:TRAIT_FACTOR]-(t2:Trait {id: 'AD'})
+RETURN 
+    f1.id AS FactorT2D, 
+    f1.name AS FactorT2DName, 
+    collect(g.id) AS SharedGenes, 
+    f2.id AS FactorALZ, 
+    f2.name AS FactorALZName
+
+    
