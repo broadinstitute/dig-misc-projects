@@ -82,6 +82,16 @@
                                                         "description": "Biolink model relationship between the tissue and the disease.",
                                                         "example": "biolink:positively_correlated_with"
                                                     },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
+                                                    },
                                                     "pubmed_ids": {
                                                         "type": "array",
                                                         "description": "List of supporting PubMed article identifiers.",
@@ -173,6 +183,16 @@
                                                         "type": "string",
                                                         "description": "Biolink model relationship between the tissue and the disease.",
                                                         "example": "biolink:derives_from"
+                                                    },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
                                                     },
                                                     "level": {
                                                         "type": "string",
@@ -276,6 +296,16 @@
                                                         "description": "Biolink model relationship between the disease and the tissue.",
                                                         "example": "biolink:expresses"
                                                     },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
+                                                    },
                                                     "level": {
                                                         "type": "string",
                                                         "description": "A qualitative value of the level recorded for the association",
@@ -377,6 +407,16 @@
                                                         "type": "string",
                                                         "description": "Biolink model relationship between the tissue and the gene.",
                                                         "example": "biolink:expressed_in"
+                                                    },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
                                                     },
                                                     "level": {
                                                         "type": "string",
@@ -480,6 +520,16 @@
                                                         "description": "Biolink model relationship between the gene and the tissue.",
                                                         "example": "biolink:expresses"
                                                     },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
+                                                    },
                                                     "level": {
                                                         "type": "string",
                                                         "description": "A qualitative value of the level recorded for the association",
@@ -582,6 +632,16 @@
                                                         "description": "Biolink model relationship describing the connection between the gene and the disease.\nExample: \"biolink:gene_associated_with_condition\" indicates that the gene is genetically associated with the disease.",
                                                         "example": "biolink:gene_associated_with_condition"
                                                     },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
+                                                    },
                                                     "pubmed_ids": {
                                                         "type": "array",
                                                         "description": "List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.",
@@ -679,6 +739,16 @@
                                                     "relationship": {
                                                         "type": "string",
                                                         "example": "biolink:condition_associated_with_gene"
+                                                    },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
                                                     },
                                                     "pubmed_ids": {
                                                         "type": "array",
@@ -779,6 +849,16 @@
                                                         "description": "Biolink model relationship describing the connection between the biological process and the disease.\nExample: \"biolink:genetic_association\" indicates that the biological process is genetically associated with the disease.",
                                                         "example": "biolink:genetic_association"
                                                     },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
+                                                    },
                                                     "pubmed_ids": {
                                                         "type": "array",
                                                         "description": "List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.",
@@ -877,6 +957,16 @@
                                                         "type": "string",
                                                         "description": "Biolink model relationship describing the connection between the disease and the biological process.\nExample: \"biolink:genetic_association\" indicates that the biological process is genetically associated with the disease.",
                                                         "example": "biolink:genetic_association"
+                                                    },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
                                                     },
                                                     "pubmed_ids": {
                                                         "type": "array",
@@ -977,6 +1067,16 @@
                                                         "description": "Biolink model relationship describing the connection between the drug and the biological process.\nExample: \"biolink:affects\" indicates that the drug affects the gene.",
                                                         "example": "biolink:affects"
                                                     },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
+                                                    },
                                                     "pubmed_ids": {
                                                         "type": "array",
                                                         "description": "List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.",
@@ -1069,6 +1169,16 @@
                                                         "type": "string",
                                                         "description": "Biolink model relationship describing the connection between the drug and the biological process.\nExample: \"biolink:affects\" indicates that the drug affects the gene.",
                                                         "example": "biolink:affected_by"
+                                                    },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
                                                     },
                                                     "pubmed_ids": {
                                                         "type": "array",
@@ -1163,6 +1273,16 @@
                                                         "description": "Biolink model relationship describing the connection between the drug and the gene.\nExample: \"biolink:affects\" indicates that the drug affects the gene.",
                                                         "example": "biolink:affects"
                                                     },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
+                                                    },
                                                     "pubmed_ids": {
                                                         "type": "array",
                                                         "description": "List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.",
@@ -1255,6 +1375,16 @@
                                                         "type": "string",
                                                         "description": "Biolink model relationship describing the connection between the gene and the drug.\nExample: \"biolink:affected\" indicates that the gene is affected by the drug.",
                                                         "example": "biolink:affected"
+                                                    },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
                                                     },
                                                     "pubmed_ids": {
                                                         "type": "array",
@@ -1349,6 +1479,16 @@
                                                         "description": "Biolink model relationship describing the connection between the drug and the disease.\nExample: \"biolink:treats\" indicates that the drug treats the disease.",
                                                         "example": "biolink:treats"
                                                     },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
+                                                    },
                                                     "pubmed_ids": {
                                                         "type": "array",
                                                         "description": "List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.",
@@ -1442,6 +1582,16 @@
                                                         "description": "Biolink model relationship describing the connection between the disease and the drug.\nExample: \"biolink:treated\" indicates that the disease is treated by the drug compound.",
                                                         "example": "biolink:treated"
                                                     },
+                                                    "primary_knowledge_source": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                                                        "example": "infores:drugcentral"
+                                                    },
+                                                    "knowledge_provider": {
+                                                        "type": "string",
+                                                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                                                        "example": "infores:molepro"
+                                                    },
                                                     "pubmed_ids": {
                                                         "type": "array",
                                                         "description": "List of supporting PubMed article identifiers (PMIDs) providing evidence for the relationship.",
@@ -1512,6 +1662,16 @@
                     "relationship": {
                         "type": "string",
                         "description": "Biolink relationship between the drug and the disease."
+                    },
+                    "primary_knowledge_source": {
+                        "type": "string",
+                        "description": "Biolink model infores of the primary knowledge source of the relationship",
+                        "example": "infores:drugcentral"
+                    },
+                    "knowledge_provider": {
+                        "type": "string",
+                        "description": "Biolink model infores of the NCATS Translator project knowledge aggregator",
+                        "example": "infores:molepro"
                     },
                     "pubmed_ids": {
                         "type": "array",

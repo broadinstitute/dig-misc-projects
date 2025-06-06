@@ -1,0 +1,45 @@
+{
+  "node_files": {
+    "factor": "data/factor.csv",
+    "trait": "data/trait.csv",
+    "gene": "data/gene.csv",
+    "gene_set": "data/gene_set.csv"
+  },
+  "edge_files": {
+    "FACTOR_GENE": {
+      "src": "factor",
+      "dst": "gene",
+      "path": "data/factor_gene.csv"
+    },
+    "FACTOR_GENE_SET": {
+      "src": "factor",
+      "dst": "gene_set",
+      "path": "data/factor_gene_set.csv"
+    },
+    "TRAIT_FACTOR": {
+      "src": "trait",
+      "dst": "factor",
+      "path": "data/trait_factor.csv"
+    },
+    "TRAIT_GENE": {
+      "src": "trait",
+      "dst": "gene",
+      "path": "data/trait_gene.csv"
+    },
+    "TRAIT_GENE_SET": {
+      "src": "trait",
+      "dst": "gene_set",
+      "path": "data/trait_gene_set.csv"
+    }
+  },
+  "model_params": {
+    "hidden_channels": 64
+  },
+  "training_params": {
+    "learning_rate": 0.001,
+    "weight_decay": 1e-5,
+    "epochs": 100
+  },
+  "model_path": "trained_model.pt",
+  "device": "cuda"
+}
