@@ -38,7 +38,7 @@ class HeteroNetworkDataset:
 
             df = pd.read_csv(filepath, dtype={key_id: int})
             if key_id not in df.columns:
-                raise ValueError(f"Node file for '{ntype}' must contain an 'id' column.")
+                raise ValueError(f"Node file for '{ntype}' must contain an '{key_id}' column.")
             df = df[[key_id]]
 
             ids = df[key_id].tolist()
@@ -84,14 +84,14 @@ class HeteroNetworkDataset:
             src_mapped = src_mapped[mask].astype(int)
             dst_mapped = dst_mapped[mask].astype(int)
 
-            # build edge_index
+            # build forward edge_index
             edge_index = torch.tensor(
                 [src_mapped.tolist(), dst_mapped.tolist()],
                 dtype=torch.long
             )
             self.data[(src_type, rel, dst_type)].edge_index = edge_index
 
-            # extract weights
+            # extract forward weights
             weights = []
             for s in df['props']:
                 try:
@@ -100,11 +100,21 @@ class HeteroNetworkDataset:
                 except Exception:
                     weights.append(0.0)
 
-            self.data[(src_type, rel, dst_type)].edge_attr = \
-                torch.tensor(weights, dtype=torch.float).unsqueeze(1)
+            edge_attr = torch.tensor(weights, dtype=torch.float).unsqueeze(1)
+            self.data[(src_type, rel, dst_type)].edge_attr = edge_attr
+
+            # --- add reverse edges to make graph undirected ---
+            rev_rel = f"{rel}_REV"
+            rev_edge_index = edge_index.flip(0)           # swap source/target
+            rev_edge_attr  = edge_attr.clone()            # same weights
+            self.data[(dst_type, rev_rel, src_type)].edge_index = rev_edge_index
+            self.data[(dst_type, rev_rel, src_type)].edge_attr  = rev_edge_attr
+            # ----------------------------------------------------------------
 
             if DEBUG:
-                print(f"[{src_type}—{rel}→{dst_type}] loaded {edge_index.size(1)} edges")
+                count = edge_index.size(1)
+                print(f"[{src_type}—{rel}→{dst_type}] loaded {count} edges")
+                print(f"[{dst_type}—{rev_rel}→{src_type}] added {count} reverse edges")
 
         if DEBUG:
             self.print_data_stats()
@@ -130,21 +140,14 @@ class HeteroNetworkDataset:
         # Edges
         for (src, rel, dst) in edge_types:
             edge_index = self.data[(src, rel, dst)].edge_index
-            edge_attr = self.data[(src, rel, dst)].edge_attr
-            num_edges = edge_index.size(1)
+            edge_attr  = self.data[(src, rel, dst)].edge_attr
+            num_edges  = edge_index.size(1)
             print(f"  • Edge type '{src}'—[{rel}]→'{dst}': {num_edges} edges")
 
-            # build reverse maps for original IDs
             rev_src = {idx: orig for orig, idx in self.id_mapping[src].items()}
             rev_dst = {idx: orig for orig, idx in self.id_mapping[dst].items()}
 
-            # sample first 10 edges and their weights
-            pairs_idx = list(
-                zip(edge_index[0].tolist(), edge_index[1].tolist())
-            )[:10]
-            weights = edge_attr.squeeze(1).tolist()[:10]
-            sample_triples = [
-                (rev_src[s], rev_dst[d], w)
-                for (s, d), w in zip(pairs_idx, weights)
-            ]
-            print(f"    sample edges (src, dst, weight): {sample_triples}")
+            pairs_idx = list(zip(edge_index[0].tolist(), edge_index[1].tolist()))[:10]
+            weights   = edge_attr.squeeze(1).tolist()[:10]
+            sample = [(rev_src[s], rev_dst[d], w) for (s, d), w in zip(pairs_idx, weights)]
+            print(f"    sample edges (src, dst, weight): {sample}")
