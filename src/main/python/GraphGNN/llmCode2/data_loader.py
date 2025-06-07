@@ -1,22 +1,26 @@
+
+# imports
 import json
 import pandas as pd
 import torch
-import ast
 from torch_geometric.data import HeteroData
+import dcc_utils as dutils
 
+
+# constants
+logger = dutils.get_logger(__name__)
+DEBUG=True
+
+# classes
 class HeteroNetworkDataset:
     """
     Loads a heterogeneous graph from CSV files, according to a JSON config.
 
-    Edge CSVs in this format must have three comma-separated fields:
-      - source (string ID)
-      - target (string ID)
-      - a Python-dict literal containing at least {'weight': <float>}
+    Now assumes each node CSV has exactly one column:
+      - 'id' (string or integer), no additional feature columns.
 
-    Example edge CSV rows:
-      828167,608085,{'weight': 0.04437}
-      860492,606920,{'weight': 0.0287}
-      819321,607168,{'weight': 0.2938}
+    Edge CSVs must be in the format:
+        source_id,target_id,{'weight': <float>}
     """
 
     def __init__(self, config_path: str):
@@ -27,49 +31,72 @@ class HeteroNetworkDataset:
         self.edge_files = self.config.get('edge_files', {})
 
         self.data = HeteroData()
+        # id_mapping[node_type] = { original_id: integer_index, ... }
         self.id_mapping = {}
 
-    def load_data(self) -> HeteroData:
-        # 1) Load node types
+    def load_data(self, id_key='neo4j_id') -> HeteroData:
+        # 1) Load all node types (only 'id' column)
         for ntype, filepath in self.node_files.items():
+            # log
+            logger.info("reading node file: {}".format(filepath))
+
             df = pd.read_csv(filepath)
-            if 'id' not in df.columns:
-                raise ValueError(f"Node file for '{ntype}' must contain an 'id' column.")
-            ids = df['id'].tolist()
+            # if 'id' not in df.columns:
+            #     raise ValueError(f"Node file for '{ntype}' must contain exactly an 'id' column.")
+            # # Drop any other columns if they exist (we ignore them)
+            # df = df[['id']]
+
+            # ids = df['id'].tolist()
+            if id_key not in df.columns:
+                raise ValueError(f"Node file for '{ntype}' must contain exactly an 'id' column.")
+            # Drop any other columns if they exist (we ignore them)
+            df = df[[id_key]]
+
+            ids = df[id_key].tolist()
             num_nodes = len(ids)
 
+            # debug
+            if DEBUG:
+                print("id list: {}".format(ids))
+
+            # Build mapping from original ID → integer index [0 .. num_nodes-1]
             self.id_mapping[ntype] = {orig_id: idx for idx, orig_id in enumerate(ids)}
+
+            # Tell PyG how many nodes of this type exist
             self.data[ntype].num_nodes = num_nodes
 
-            feature_cols = [c for c in df.columns if c != 'id']
-            if feature_cols:
-                feats = torch.tensor(df[feature_cols].values, dtype=torch.float)
-                if feats.shape[0] != num_nodes:
-                    raise ValueError(f"Mismatch in number of rows vs. num_nodes for '{ntype}'.")
-                self.data[ntype].x = feats
+            # We do NOT load any feature tensor; the model will use learned embeddings only.
 
-        # 2) Load edge types (only extracting 'weight' from the dict)
+        # 2) Load all edge types (extract only 'weight')
         for rel, info in self.edge_files.items():
             src_type = info['src']
             dst_type = info['dst']
             path = info['path']
 
+            # log
+            logger.info("reading edge file: {}".format(path))
+
             if src_type not in self.node_files or dst_type not in self.node_files:
                 raise ValueError(f"Edge '{rel}' references unknown node types '{src_type}' or '{dst_type}'.")
 
-            # Read CSV with no header; columns: source, target, props
+            # Read CSV with no header; columns: source, target, props_dict
             df = pd.read_csv(path, header=None, names=['source', 'target', 'props'])
 
+            # Map string‐IDs to integer indices
             src_indices = df['source'].map(self.id_mapping[src_type]).tolist()
             dst_indices = df['target'].map(self.id_mapping[dst_type]).tolist()
 
+            if DEBUG:
+                print("source ids: {}".format(src_indices))
+                
             edge_index = torch.tensor([src_indices, dst_indices], dtype=torch.long)
             self.data[(src_type, rel, dst_type)].edge_index = edge_index
 
-            # Parse and extract only 'weight'
+            # Parse 'props' (a stringified dict) to extract only the 'weight' value
             weight_list = []
             for s in df['props']:
-                pdict = ast.literal_eval(s)
+                # e.g. s == "{'weight': 0.04437}"
+                pdict = eval(s)  # or ast.literal_eval(s) if you prefer safety
                 if 'weight' not in pdict:
                     raise ValueError(f"Missing 'weight' key in props: {s}")
                 weight_list.append(float(pdict['weight']))

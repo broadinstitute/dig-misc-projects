@@ -11,5 +11,19 @@ F123,G456,0.85
 F456,G789,0.42
 
 
+- properties for edges to train on
+  - beta_uncorrected for trait gene set, combined for trait gene
 
 
+
+
+- process of data massaging
+  - make all props of edges 'weight' column
+  - remove edges with no weight
+    - cat Factor_FACTOR_GENE_Gene_edges.csv | grep -v ',{}$' > Factor_FACTOR_GENE_SET_GeneSet_edges.csv
+
+
+- data notes 
+  - have factor/geneset edges with no weights
+  - extra edges in graph
+  - 
