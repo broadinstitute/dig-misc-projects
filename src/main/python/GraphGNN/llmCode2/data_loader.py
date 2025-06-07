@@ -113,15 +113,38 @@ class HeteroNetworkDataset:
 
     def print_data_stats(self):
         """
-        Print the number of nodes per node‐type and the number of edges per
-        (src, rel, dst) edge‐type in self.data.
+        Print counts and a small sample (first 10) of each node type and edge type, including edge weights.
         """
         node_types, edge_types = self.data.metadata()
 
         print("=== Graph Statistics ===")
+        # Nodes
         for ntype in node_types:
-            print(f"  • Node type '{ntype}': {self.data[ntype].num_nodes} nodes")
+            count = self.data[ntype].num_nodes
+            print(f"  • Node type '{ntype}': {count} nodes")
 
+            rev_map = {idx: orig for orig, idx in self.id_mapping[ntype].items()}
+            sample_ids = [rev_map[i] for i in range(min(10, count))]
+            print(f"    sample node IDs: {sample_ids}")
+
+        # Edges
         for (src, rel, dst) in edge_types:
-            cnt = self.data[(src, rel, dst)].edge_index.size(1)
-            print(f"  • Edge type '{src}'—[{rel}]→'{dst}': {cnt} edges")
+            edge_index = self.data[(src, rel, dst)].edge_index
+            edge_attr = self.data[(src, rel, dst)].edge_attr
+            num_edges = edge_index.size(1)
+            print(f"  • Edge type '{src}'—[{rel}]→'{dst}': {num_edges} edges")
+
+            # build reverse maps for original IDs
+            rev_src = {idx: orig for orig, idx in self.id_mapping[src].items()}
+            rev_dst = {idx: orig for orig, idx in self.id_mapping[dst].items()}
+
+            # sample first 10 edges and their weights
+            pairs_idx = list(
+                zip(edge_index[0].tolist(), edge_index[1].tolist())
+            )[:10]
+            weights = edge_attr.squeeze(1).tolist()[:10]
+            sample_triples = [
+                (rev_src[s], rev_dst[d], w)
+                for (s, d), w in zip(pairs_idx, weights)
+            ]
+            print(f"    sample edges (src, dst, weight): {sample_triples}")

@@ -36,7 +36,7 @@
     "hidden_channels": 64
   },
   "training_params": {
-    "learning_rate": 0.0001,
+    "learning_rate": 0.001,
     "weight_decay": 1e-5,
     "epochs": 100
   },
