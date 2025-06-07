@@ -15,18 +15,34 @@ class HeteroGNN(torch.nn.Module):
             for ntype in node_types
         })
 
-        # 2) Two HeteroConv layers: use fixed in_channels=hidden_channels
+        # # 2) Two HeteroConv layers: use fixed in_channels=hidden_channels
+        # conv_dict_1 = {
+        #     edge_type: GCNConv(hidden_channels, hidden_channels)
+        #     for edge_type in edge_types
+        # }
+        # conv_dict_2 = {
+        #     edge_type: GCNConv(hidden_channels, hidden_channels)
+        #     for edge_type in edge_types
+        # }
+
+        # self.conv1 = HeteroConv(conv_dict_1, aggr='sum')
+        # self.conv2 = HeteroConv(conv_dict_2, aggr='sum')
+
+        # 2) Two HeteroConv layers: disable self-loops on each GCNConv
         conv_dict_1 = {
-            edge_type: GCNConv(hidden_channels, hidden_channels)
+            edge_type: GCNConv(hidden_channels, hidden_channels,
+                              add_self_loops=False)
             for edge_type in edge_types
         }
         conv_dict_2 = {
-            edge_type: GCNConv(hidden_channels, hidden_channels)
+            edge_type: GCNConv(hidden_channels, hidden_channels,
+                              add_self_loops=False)
             for edge_type in edge_types
         }
 
         self.conv1 = HeteroConv(conv_dict_1, aggr='sum')
         self.conv2 = HeteroConv(conv_dict_2, aggr='sum')
+
 
     def forward(self, edge_index_dict) -> dict:
         # Initialize from embeddings
