@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torch_geometric.nn import HeteroConv, GCNConv
+from torch_geometric.nn import HeteroConv, GCNConv, SAGEConv
 
 class HeteroGNN(torch.nn.Module):
     def __init__(self, metadata, num_nodes_dict: dict, hidden_channels: int):
@@ -30,12 +30,12 @@ class HeteroGNN(torch.nn.Module):
 
         # 2) Two HeteroConv layers: disable self-loops on each GCNConv
         conv_dict_1 = {
-            edge_type: GCNConv(hidden_channels, hidden_channels,
+            edge_type: SAGEConv((hidden_channels), hidden_channels,
                               add_self_loops=False)
             for edge_type in edge_types
         }
         conv_dict_2 = {
-            edge_type: GCNConv(hidden_channels, hidden_channels,
+            edge_type: SAGEConv(hidden_channels, hidden_channels,
                               add_self_loops=False)
             for edge_type in edge_types
         }
