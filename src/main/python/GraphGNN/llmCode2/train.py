@@ -2,7 +2,6 @@ import json
 import torch
 import torch.nn.functional as F
 from torch.optim import Adam
-from torch_geometric.utils import negative_sampling
 from data_loader import HeteroNetworkDataset
 from model import HeteroGNN
 
@@ -39,31 +38,32 @@ def train():
 
         # 6) Compute link‐prediction loss for each relation type
         total_loss = torch.zeros(1, device=device)
-        for edge_type, edge_data in data.edge_index_dict.items():
+        for edge_type, edge_index in data.edge_index_dict.items():
             src_type, rel, dst_type = edge_type
-            edge_index = edge_data  # [2, num_pos_edges]
+            num_src = data[src_type].num_nodes
+            num_dst = data[dst_type].num_nodes
 
-            # Positive scores and labels
+            # Positive scores & labels
             pos_scores = model.decode(z_dict, edge_index, src_type, dst_type)
             pos_labels = torch.ones(pos_scores.size(0), device=device)
 
-            # Negative sampling
-            num_src = data[src_type].num_nodes
-            num_dst = data[dst_type].num_nodes
-            neg_edge_index = negative_sampling(
-                edge_index,
-                num_nodes=(num_src, num_dst),
-                num_neg_samples=edge_index.size(1),
-                method='sparse'
-            )
+            # ---- pure‐PyTorch negative sampling ----
+            # Draw as many random (src, dst) pairs as there are positives.
+            # Note: this may occasionally sample a real edge as "negative," 
+            # but in large graphs the chance is low.
+            num_pos = edge_index.size(1)
+            neg_src = torch.randint(0, num_src, (num_pos,), device=device)
+            neg_dst = torch.randint(0, num_dst, (num_pos,), device=device)
+            neg_edge_index = torch.stack([neg_src, neg_dst], dim=0)
+            # ---------------------------------------
+
             neg_scores = model.decode(z_dict, neg_edge_index, src_type, dst_type)
             neg_labels = torch.zeros(neg_scores.size(0), device=device)
 
             # Combine and compute BCE loss
             scores = torch.cat([pos_scores, neg_scores], dim=0)
             labels = torch.cat([pos_labels, neg_labels], dim=0)
-            loss = F.binary_cross_entropy_with_logits(scores, labels)
-            total_loss += loss
+            total_loss += F.binary_cross_entropy_with_logits(scores, labels)
 
         total_loss.backward()
         optimizer.step()
@@ -71,9 +71,8 @@ def train():
         print(f"Epoch {epoch:03d} | Loss: {total_loss.item():.4f}")
 
     # 7) Save the trained model
-    model_path = config['model_path']
-    torch.save(model.state_dict(), model_path)
-    print(f"\nTraining complete. Model saved to: {model_path}\n")
+    torch.save(model.state_dict(), config['model_path'])
+    print(f"\nTraining complete. Model saved to: {config['model_path']}\n")
 
 if __name__ == '__main__':
     train()
