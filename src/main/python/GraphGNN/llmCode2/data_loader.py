@@ -34,44 +34,32 @@ class HeteroNetworkDataset:
         # id_mapping[node_type] = { original_id: integer_index, ... }
         self.id_mapping = {}
 
-    def load_data(self, id_key='neo4j_id') -> HeteroData:
+    def load_data(self) -> HeteroData:
         # 1) Load all node types (only 'id' column)
         for ntype, filepath in self.node_files.items():
             # log
             logger.info("reading node file: {}".format(filepath))
 
-            df = pd.read_csv(filepath)
-            # if 'id' not in df.columns:
-            #     raise ValueError(f"Node file for '{ntype}' must contain exactly an 'id' column.")
-            # # Drop any other columns if they exist (we ignore them)
-            # df = df[['id']]
+            df = pd.read_csv(filepath, dtype={'id': str})
+            if 'id' not in df.columns:
+                raise ValueError(f"Node file for '{ntype}' must contain an 'id' column.")
+            df = df[['id']]  # drop any extras
 
-            # ids = df['id'].tolist()
-            if id_key not in df.columns:
-                raise ValueError(f"Node file for '{ntype}' must contain exactly an 'id' column.")
-            # Drop any other columns if they exist (we ignore them)
-            df = df[[id_key]]
-
-            ids = df[id_key].tolist()
+            ids = df['id'].tolist()
             num_nodes = len(ids)
 
             # debug
             if DEBUG:
                 print("id list: {}".format(ids))
 
-            # Build mapping from original ID → integer index [0 .. num_nodes-1]
             self.id_mapping[ntype] = {orig_id: idx for idx, orig_id in enumerate(ids)}
-
-            # Tell PyG how many nodes of this type exist
             self.data[ntype].num_nodes = num_nodes
-
-            # We do NOT load any feature tensor; the model will use learned embeddings only.
 
         # 2) Load all edge types (extract only 'weight')
         for rel, info in self.edge_files.items():
             src_type = info['src']
             dst_type = info['dst']
-            path = info['path']
+            path     = info['path']
 
             # log
             logger.info("reading edge file: {}".format(path))
@@ -79,27 +67,35 @@ class HeteroNetworkDataset:
             if src_type not in self.node_files or dst_type not in self.node_files:
                 raise ValueError(f"Edge '{rel}' references unknown node types '{src_type}' or '{dst_type}'.")
 
-            # Read CSV with no header; columns: source, target, props_dict
-            df = pd.read_csv(path, header=None, names=['source', 'target', 'props'])
+            # Read CSV with no header; columns: source, target, props
+            df = pd.read_csv(
+                path,
+                header=None,
+                names=['source', 'target', 'props'],
+                dtype={'source': str, 'target': str}
+            )
 
-            # Map string‐IDs to integer indices
-            src_indices = df['source'].map(self.id_mapping[src_type]).tolist()
-            dst_indices = df['target'].map(self.id_mapping[dst_type]).tolist()
+            # Map string-IDs to integer indices
+            src_mapped = df['source'].map(self.id_mapping[src_type])
+            dst_mapped = df['target'].map(self.id_mapping[dst_type])
 
-            if DEBUG:
-                print("source ids: {}".format(src_indices))
-                
+            # --- filter out edges with missing source or target mapping ---
+            mask = src_mapped.notnull() & dst_mapped.notnull()
+            df         = df[mask]
+            src_mapped = src_mapped[mask]
+            dst_mapped = dst_mapped[mask]
+            # ----------------------------------------------------------------
+
+            src_indices = src_mapped.astype(int).tolist()
+            dst_indices = dst_mapped.astype(int).tolist()
             edge_index = torch.tensor([src_indices, dst_indices], dtype=torch.long)
             self.data[(src_type, rel, dst_type)].edge_index = edge_index
 
-            # Parse 'props' (a stringified dict) to extract only the 'weight' value
+            # Parse 'props' to extract only the 'weight' value
             weight_list = []
             for s in df['props']:
-                # e.g. s == "{'weight': 0.04437}"
-                pdict = eval(s)  # or ast.literal_eval(s) if you prefer safety
-                if 'weight' not in pdict:
-                    raise ValueError(f"Missing 'weight' key in props: {s}")
-                weight_list.append(float(pdict['weight']))
+                pdict = eval(s)  # or ast.literal_eval(s)
+                weight_list.append(float(pdict.get('weight', 0.0)))
 
             edge_weight_tensor = torch.tensor(weight_list, dtype=torch.float).unsqueeze(1)
             self.data[(src_type, rel, dst_type)].edge_attr = edge_weight_tensor
