@@ -4,6 +4,11 @@ import torch.nn.functional as F
 from torch.optim import Adam
 from data_loader import HeteroNetworkDataset
 from model import HeteroGNN
+import dcc_utils as dutils
+
+# constants
+logger = dutils.get_logger(__name__)
+DEBUG = True
 
 def train():
     # 1) Load config
@@ -68,11 +73,13 @@ def train():
         total_loss.backward()
         optimizer.step()
 
-        print(f"Epoch {epoch:03d} | Loss: {total_loss.item():.4f}")
+        # print(f"Epoch {epoch:03d} | Loss: {total_loss.item():.4f}")
+        logger.info(f"Epoch {epoch:03d} | Loss: {total_loss.item():.4f}")
 
     # 7) Save the trained model
     torch.save(model.state_dict(), config['model_path'])
-    print(f"\nTraining complete. Model saved to: {config['model_path']}\n")
+    # print(f"\nTraining complete. Model saved to: {config['model_path']}\n")
+    logger.info(f"\nTraining complete. Model saved to: {config['model_path']}\n")
 
 if __name__ == '__main__':
     train()
