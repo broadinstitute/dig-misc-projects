@@ -1,7 +1,17 @@
+
+# imports
 import torch
 import torch.nn.functional as F
 from torch_geometric.nn import HeteroConv, SAGEConv
+import json
+from data_loader import HeteroNetworkDataset
+import dcc_utils as dutils
 
+# constants
+logger = dutils.get_logger(__name__)
+DEBUG = True
+
+# class
 class HeteroGNN(torch.nn.Module):
     def __init__(self, metadata, num_nodes_dict: dict, hidden_channels: int):
         super().__init__()
@@ -55,3 +65,63 @@ class HeteroGNN(torch.nn.Module):
         dst_z = z_dict[dst_type]
         src_idx, dst_idx = edge_index
         return (src_z[src_idx] * dst_z[dst_idx]).sum(dim=1)
+
+
+def load_model():
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+    device = torch.device(config.get('device', 'cpu'))
+
+    # 2) Load data for mappings
+    dataset = HeteroNetworkDataset('config.json')
+    data = dataset.load_data().to(device)
+
+    # 3) Metadata and node counts
+    metadata = data.metadata()
+    node_types, edge_types = metadata
+    num_nodes_dict = {ntype: data[ntype].num_nodes for ntype in node_types}
+
+    # 4) Build model & load weights
+    hidden_channels = config['model_params']['hidden_channels']
+    model = HeteroGNN(metadata, num_nodes_dict, hidden_channels).to(device)
+    model.load_state_dict(torch.load(config['model_path'], map_location=device))
+
+    # return
+    return model
+
+
+def get_node_embeddings():
+    # initialize
+    z_dict = None
+
+    # load model
+    with open('config.json') as f:
+        config = json.load(f)
+    device = torch.device(config.get('device','cpu'))
+
+    dataset = HeteroNetworkDataset('config.json')
+    data    = dataset.load_data().to(device)
+
+    # 2) Build model & load weights
+    metadata      = data.metadata()
+    num_nodes_dict= {ntype: data[ntype].num_nodes for ntype in metadata[0]}
+    hidden_dim    = config['model_params']['hidden_channels']
+
+    model = HeteroGNN(metadata, num_nodes_dict, hidden_dim).to(device)
+    model.load_state_dict(torch.load(config['model_path'], map_location=device))
+    model.eval()
+
+    # 3) Run one forward pass (this applies both conv layers)
+    with torch.no_grad():
+        z_dict = model(data.edge_index_dict) 
+
+    # return
+    return z_dict
+
+
+if __name__ == "__main__":
+    model = load_model()
+    logger.info("got loaded model: {}".format(model))
+
+    node_embeddings = get_node_embeddings()
+    logger.info("got node embeddings: {}".format(node_embeddings))
