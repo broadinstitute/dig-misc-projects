@@ -53,7 +53,58 @@
 }
 
 - edges and propertues
-
+{
+    "data": [
+        {
+            "Label": "FACTOR_GENE",
+            "Properties": [
+                [
+                    "weight"
+                ]
+            ]
+        },
+        {
+            "Label": "FACTOR_GENE_SET",
+            "Properties": [
+                [
+                    "weight"
+                ],
+                []
+            ]
+        },
+        {
+            "Label": "TRAIT_FACTOR",
+            "Properties": [
+                [
+                    "weight"
+                ]
+            ]
+        },
+        {
+            "Label": "TRAIT_GENE",
+            "Properties": [
+                [
+                    "prior",
+                    "combined"
+                ]
+            ]
+        },
+        {
+            "Label": "TRAIT_GENE_SET",
+            "Properties": [
+                [
+                    "beta_uncorrected",
+                    "beta"
+                ],
+                [
+                    "beta"
+                ],
+                []
+            ]
+        }
+    ],
+    "message": "all good"
+}
 
 
 
@@ -81,10 +132,43 @@ node counts:
 }
 
 edge counts:
-relType	count
-"FACTOR_GENE"	33660962
-"FACTOR_GENE_SET"	5089119
-"TRAIT_FACTOR"	39228
-"TRAIT_GENE"	1299086
-"TRAIT_GENE_SET"	1787999
+{
+    "data": [
+        {
+            "relationshipType": "FACTOR_GENE",
+            "count": 67321924
+        },
+        {
+            "relationshipType": "FACTOR_GENE_SET",
+            "count": 10178238
+        },
+        {
+            "relationshipType": "TRAIT_FACTOR",
+            "count": 78456
+        },
+        {
+            "relationshipType": "TRAIT_GENE",
+            "count": 2598172
+        },
+        {
+            "relationshipType": "TRAIT_GENE_SET",
+            "count": 3575998
+        }
+    ],
+    "message": "all good"
+}
+
+
+
+[2025-06-09 10:37:27,664] - INFO - __main__ MainThread : got loaded model: HeteroGNN(
+  (embeddings): ModuleDict(
+    (factor): Embedding(39228, 64)
+    (trait): Embedding(10423, 64)
+    (gene): Embedding(22572, 64)
+    (gene_set): Embedding(112945, 64)
+  )
+  (conv1): HeteroConv(num_relations=10)
+  (conv2): HeteroConv(num_relations=10)
+)
+
 

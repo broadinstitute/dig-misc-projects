@@ -67,7 +67,7 @@ class HeteroGNN(torch.nn.Module):
         return (src_z[src_idx] * dst_z[dst_idx]).sum(dim=1)
 
 
-def load_model():
+def load_model_and_data():
     with open('config.json', 'r') as f:
         config = json.load(f)
     device = torch.device(config.get('device', 'cpu'))
@@ -87,28 +87,28 @@ def load_model():
     model.load_state_dict(torch.load(config['model_path'], map_location=device))
 
     # return
-    return model
+    return model, data
 
 
-def get_node_embeddings():
+def get_node_embeddings(model, data):
     # initialize
     z_dict = None
 
-    # load model
-    with open('config.json') as f:
-        config = json.load(f)
-    device = torch.device(config.get('device','cpu'))
+    # # load model
+    # with open('config.json') as f:
+    #     config = json.load(f)
+    # device = torch.device(config.get('device','cpu'))
 
-    dataset = HeteroNetworkDataset('config.json')
-    data    = dataset.load_data().to(device)
+    # dataset = HeteroNetworkDataset('config.json')
+    # data    = dataset.load_data().to(device)
 
-    # 2) Build model & load weights
-    metadata      = data.metadata()
-    num_nodes_dict= {ntype: data[ntype].num_nodes for ntype in metadata[0]}
-    hidden_dim    = config['model_params']['hidden_channels']
+    # # 2) Build model & load weights
+    # metadata      = data.metadata()
+    # num_nodes_dict= {ntype: data[ntype].num_nodes for ntype in metadata[0]}
+    # hidden_dim    = config['model_params']['hidden_channels']
 
-    model = HeteroGNN(metadata, num_nodes_dict, hidden_dim).to(device)
-    model.load_state_dict(torch.load(config['model_path'], map_location=device))
+    # model = HeteroGNN(metadata, num_nodes_dict, hidden_dim).to(device)
+    # model.load_state_dict(torch.load(config['model_path'], map_location=device))
     model.eval()
 
     # 3) Run one forward pass (this applies both conv layers)
@@ -120,8 +120,10 @@ def get_node_embeddings():
 
 
 if __name__ == "__main__":
-    model = load_model()
+    model, data = load_model_and_data()
     logger.info("got loaded model: {}".format(model))
 
-    node_embeddings = get_node_embeddings()
-    logger.info("got node embeddings: {}".format(node_embeddings))
+    node_embeddings = get_node_embeddings(model, data)
+    # logger.info("got node embeddings: {}".format(node_embeddings))
+    for key, value in node_embeddings.items():
+        logger.info("for embedding key: {}, got tensor shape: {}".format(key, value.shape))
