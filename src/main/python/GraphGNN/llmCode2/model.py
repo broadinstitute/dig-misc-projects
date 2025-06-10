@@ -67,7 +67,7 @@ class HeteroGNN(torch.nn.Module):
         return (src_z[src_idx] * dst_z[dst_idx]).sum(dim=1)
 
 
-def load_model_and_data():
+def load_model_and_data(path_model=None):
     with open('config.json', 'r') as f:
         config = json.load(f)
     device = torch.device(config.get('device', 'cpu'))
@@ -84,10 +84,15 @@ def load_model_and_data():
     # 4) Build model & load weights
     hidden_channels = config['model_params']['hidden_channels']
     model = HeteroGNN(metadata, num_nodes_dict, hidden_channels).to(device)
-    model.load_state_dict(torch.load(config['model_path'], map_location=device))
+
+    # load model weights
+    if not path_model:
+        model.load_state_dict(torch.load(config['model_to_load_path'], map_location=device))
+    else:
+        model.load_state_dict(torch.load(config[path_model], map_location=device))
 
     # return
-    return model, data
+    return model, data, dataset
 
 
 def get_node_embeddings(model, data):
@@ -119,11 +124,30 @@ def get_node_embeddings(model, data):
     return z_dict
 
 
+def save_dataset_id_mapping(dataset, log=False):
+    '''
+    will save the dataset mappings to file
+    '''
+    # get the config
+    config = dutils.load_config()
+
+    # get the dataset id mappings
+    id_mapping = dataset.id_mapping
+
+    with open(config.get(dutils.KEY_INFERENCE).get(dutils.KEY_DATA_MAPPING), 'w') as f:
+        json.dump(id_mapping, f, indent=2)
+
+
+
+
 if __name__ == "__main__":
-    model, data = load_model_and_data()
+    model, data, dataset = load_model_and_data()
     logger.info("got loaded model: {}".format(model))
 
     node_embeddings = get_node_embeddings(model, data)
     # logger.info("got node embeddings: {}".format(node_embeddings))
     for key, value in node_embeddings.items():
         logger.info("for embedding key: {}, got tensor shape: {}".format(key, value.shape))
+
+    # print("dataset: {}".format(dataset.id_mapping))
+    save_dataset_id_mapping(dataset=dataset)

@@ -2,6 +2,7 @@
 # imports
 import logging
 import sys 
+import json
 
 # settings
 # logging.basicConfig(level=logging.INFO, format=f'[%(asctime)s] - %(levelname)s - %(name)s %(threadName)s : %(message)s')
@@ -16,6 +17,14 @@ logging.basicConfig(
     ]
 )
 
+
+# constants
+KEY_NODE_FILES = "node_files"
+KEY_INFERENCE = "inference"
+KEY_DATA_MAPPING = "dataset_mapping"
+KEY_NODE_EMBEDDINGS = "node_embeddings"
+
+
 # methods
 def get_logger(name): 
     # get the logger
@@ -24,4 +33,12 @@ def get_logger(name):
 
     # return
     return logger 
+
+
+def load_config(config_path='config.json'):
+    config = None
+    with open(config_path, 'r') as f:
+        config = json.load(f)
+
+    return config
 

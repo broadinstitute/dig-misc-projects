@@ -40,6 +40,12 @@
     "weight_decay": 1e-5,
     "epochs": 100
   },
+  "inference": {
+    "model_path": "trained_model.pt",
+    "dataset_mapping": "result/data_mapping.json",
+    "node_embeddings": "result/node_embeddings.csv"
+  },
   "model_path": "trained_model.pt",
-  "device": "cpu"
+  "device": "cpu",
+  "model_to_load_path": "trained_model.pt"
 }
