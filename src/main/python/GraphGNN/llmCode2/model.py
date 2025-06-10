@@ -87,9 +87,9 @@ def load_model_and_data(path_model=None):
 
     # load model weights
     if not path_model:
-        model.load_state_dict(torch.load(config['model_to_load_path'], map_location=device))
-    else:
-        model.load_state_dict(torch.load(config[path_model], map_location=device))
+        path_model = config['model_to_load_path']
+    logger.info("loading model from file: {}".format(path_model))
+    model.load_state_dict(torch.load(path_model, map_location=device))
 
     # return
     return model, data, dataset
