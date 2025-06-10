@@ -170,14 +170,18 @@ def save_tensors_to_csv(map_tensor, output_filename='tensor_data.csv'):
 
 
 if __name__ == "__main__":
+  # get config
+  config = dutils.load_config()
+
   # data = main()
   map_nodes = parse_node_files()
   for map_type, map_value in map_nodes.items():
     print("{}: {}".format(map_type, json.dumps(list(map_value.items())[:2], indent=2)))
 
   # get the node embeddings and the dataset for mappings of neo4j id
-  model, data, dataset = load_model_and_data()
-  logger.info("got loaded model: {}".format(model))
+  path_model = config.get(dutils.KEY_INFERENCE).get(dutils.KEY_MODEL_PATH)
+  model, data, dataset = load_model_and_data(path_model=path_model)
+  logger.info("from path: {}, got loaded model: {}".format(path_model, model))
 
   node_embeddings = get_node_embeddings(model, data)
   # logger.info("got node embeddings: {}".format(node_embeddings))
@@ -188,7 +192,7 @@ if __name__ == "__main__":
   map_node_tensor = create_tensor_map(map_node_embeddings=get_node_embeddings(model=model, data=data), map_node_ids=map_nodes, dataset=dataset)
 
   # save the tensor map to df csv file
-  path_embeddings_file = dutils.load_config().get(dutils.KEY_INFERENCE).get(dutils.KEY_NODE_EMBEDDINGS)
+  path_embeddings_file = config.get(dutils.KEY_INFERENCE).get(dutils.KEY_NODE_EMBEDDINGS)
   save_tensors_to_csv(map_tensor=map_node_tensor, output_filename=path_embeddings_file)
   # print("got tensor map: {}".format(map_node_tensor))
 
