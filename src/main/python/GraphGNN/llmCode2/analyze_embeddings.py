@@ -4,10 +4,19 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from umap import UMAP
+import umap.umap_ as umap
 from sklearn.preprocessing import StandardScaler
 import warnings
 warnings.filterwarnings('ignore')
+import dcc_utils as dutils
+
+
+# constants
+logger = dutils.get_logger(__name__)
+DEBUG = True
+
+
+
 
 def create_umap_visualization(csv_file_path, output_file=None):
     """
@@ -38,7 +47,7 @@ def create_umap_visualization(csv_file_path, output_file=None):
     
     # Apply UMAP
     print("Applying UMAP dimensionality reduction...")
-    umap_reducer = UMAP(
+    umap_reducer = umap.UMAP(
         n_neighbors=15,      # Number of neighbors to consider
         min_dist=0.1,        # Minimum distance between points
         n_components=2,      # 2D visualization
@@ -112,7 +121,7 @@ def create_enhanced_umap_plot(csv_file_path, output_file=None):
     features_scaled = scaler.fit_transform(features)
     
     # Apply UMAP
-    umap_reducer = UMAP(n_neighbors=15, min_dist=0.1, n_components=2, random_state=42)
+    umap_reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, n_components=2, random_state=42)
     embedding = umap_reducer.fit_transform(features_scaled)
     
     # Create subplots
@@ -162,8 +171,14 @@ def create_enhanced_umap_plot(csv_file_path, output_file=None):
 
 # Example usage
 if __name__ == "__main__":
+    # load configuration
+    config = dutils.load_config()
+
+    # get the node embedding file names
+    file_name = config.get(dutils.KEY_INFERENCE).get(dutils.KEY_NODE_EMBEDDINGS_BY_TYPE)
+
     # Replace 'your_data.csv' with the path to your CSV file
-    csv_file = 'your_data.csv'
+    csv_file = file_name.format('gene')
     
     print("Creating basic UMAP visualization...")
     embedding, reducer = create_umap_visualization(csv_file)
@@ -191,7 +206,7 @@ if __name__ == "__main__":
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
     
     for i, params in enumerate(param_combinations):
-        umap_reducer = UMAP(
+        umap_reducer = umap.UMAP(
             n_neighbors=params['n_neighbors'],
             min_dist=params['min_dist'],
             n_components=2,
