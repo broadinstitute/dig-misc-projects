@@ -169,28 +169,19 @@ def create_enhanced_umap_plot(csv_file_path, output_file=None):
     
     return embedding, umap_reducer
 
-# Example usage
-if __name__ == "__main__":
-    # load configuration
-    config = dutils.load_config()
 
-    # get the node embedding file names
-    file_name = config.get(dutils.KEY_INFERENCE).get(dutils.KEY_NODE_EMBEDDINGS_BY_TYPE)
-
-    # Replace 'your_data.csv' with the path to your CSV file
-    csv_file = file_name.format('gene')
-    
-    print("Creating basic UMAP visualization...")
-    embedding, reducer = create_umap_visualization(csv_file)
-    
-    print("\nCreating enhanced UMAP visualization...")
-    embedding_enhanced, reducer_enhanced = create_enhanced_umap_plot(csv_file, 'umap_enhanced.png')
-    
-    # You can also experiment with different UMAP parameters
-    print("\nExperimenting with different UMAP parameters...")
-    
+def create_umap_comparison_file_for_node_type(csv_file, node_type):
+    '''
+    creates a umap graphic file for the dataframe provided
+    '''
     # Read data
+    file_out = "umap_parameter_comparison_{}.png".format(node_type)
     df = pd.read_csv(csv_file)
+
+    # log
+    print("\nExperimenting with different UMAP parameters for node type: {}".format(node_type))
+
+    # get the features
     feature_columns = [col for col in df.columns if col.startswith('val_')]
     features = df[feature_columns].values
     scaler = StandardScaler()
@@ -221,9 +212,73 @@ if __name__ == "__main__":
         axes[i].grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('umap_parameter_comparison.png', dpi=300, bbox_inches='tight')
+    plt.savefig(file_out, dpi=300, bbox_inches='tight')
     plt.show()
     
-    print("Parameter comparison plot saved as 'umap_parameter_comparison.png'")
+    print("Parameter comparison plot saved as '{}'".format(file_out))
+
+
+
+# Example usage
+if __name__ == "__main__":
+    # load configuration
+    config = dutils.load_config()
+
+    # get the node embedding file names
+    file_name = config.get(dutils.KEY_INFERENCE).get(dutils.KEY_NODE_EMBEDDINGS_BY_TYPE)
+
+    for node_type in ['gene', 'trait', 'gene_set', 'factor']:
+    # for node_type in ['trait']:
+        csv_file = file_name.format(node_type)
+
+        create_umap_comparison_file_for_node_type(csv_file=csv_file, node_type=node_type)
+    # # Replace 'your_data.csv' with the path to your CSV file
+    # csv_file = file_name.format('gene')
+    
+    # print("Creating basic UMAP visualization...")
+    # embedding, reducer = create_umap_visualization(csv_file)
+    
+    # print("\nCreating enhanced UMAP visualization...")
+    # embedding_enhanced, reducer_enhanced = create_enhanced_umap_plot(csv_file, 'umap_enhanced.png')
+    
+    # # You can also experiment with different UMAP parameters
+    # print("\nExperimenting with different UMAP parameters...")
+    
+    # # Read data
+    # df = pd.read_csv(csv_file)
+    # feature_columns = [col for col in df.columns if col.startswith('val_')]
+    # features = df[feature_columns].values
+    # scaler = StandardScaler()
+    # features_scaled = scaler.fit_transform(features)
+    
+    # # Try different parameter combinations
+    # param_combinations = [
+    #     {'n_neighbors': 5, 'min_dist': 0.01, 'title': 'n_neighbors=5, min_dist=0.01'},
+    #     {'n_neighbors': 30, 'min_dist': 0.5, 'title': 'n_neighbors=30, min_dist=0.5'},
+    #     {'n_neighbors': 15, 'min_dist': 0.1, 'title': 'n_neighbors=15, min_dist=0.1 (default)'}
+    # ]
+    
+    # fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+    
+    # for i, params in enumerate(param_combinations):
+    #     umap_reducer = umap.UMAP(
+    #         n_neighbors=params['n_neighbors'],
+    #         min_dist=params['min_dist'],
+    #         n_components=2,
+    #         random_state=42
+    #     )
+    #     embedding = umap_reducer.fit_transform(features_scaled)
+        
+    #     axes[i].scatter(embedding[:, 0], embedding[:, 1], alpha=0.7, s=50)
+    #     axes[i].set_title(params['title'])
+    #     axes[i].set_xlabel('UMAP Dimension 1')
+    #     axes[i].set_ylabel('UMAP Dimension 2')
+    #     axes[i].grid(True, alpha=0.3)
+    
+    # plt.tight_layout()
+    # plt.savefig('umap_parameter_comparison.png', dpi=300, bbox_inches='tight')
+    # plt.show()
+    
+    # print("Parameter comparison plot saved as 'umap_parameter_comparison.png'")
 
     
