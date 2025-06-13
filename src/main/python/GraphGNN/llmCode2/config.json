@@ -43,7 +43,8 @@
   "inference": {
     "model_path": "trained_model.pt",
     "dataset_mapping": "result/data_mapping.json",
-    "node_embeddings": "result/node_embeddings.csv"
+    "node_embeddings": "result/node_embeddings.csv",
+    "node_embeddings_by_type": "result/node_embeddings_{}.csv"
   },
   "model_path": "trained_model.pt",
   "device": "cpu",

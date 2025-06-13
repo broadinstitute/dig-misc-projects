@@ -12,7 +12,8 @@ F456,G789,0.42
 
 
 - properties for edges to train on
-  - beta_uncorrected for trait gene set, combined for trait gene
+  - beta_uncorrected for trait gene set
+  - combined for trait gene
 
 
 
@@ -27,3 +28,53 @@ F456,G789,0.42
   - have factor/geneset edges with no weights
   - extra edges in graph
   - 
+
+
+
+
+
+
+20250607 - run 01 on VM cpu
+
+reading node file: data/GeneSet_nodes.csv
+[2025-06-07 18:11:47,511] - INFO - data_loader MainThread : reading node file: data/GeneSet_nodes.csv
+[gene_set] loaded 112945 nodes
+reading edge file: data/Factor_FACTOR_GENE_Gene_edges.csv
+[2025-06-07 18:11:47,632] - INFO - data_loader MainThread : reading edge file: data/Factor_FACTOR_GENE_Gene_edges.csv
+[factor—FACTOR_GENE→gene] loaded 33660962 edges
+reading edge file: data/Factor_FACTOR_GENE_SET_GeneSet_edges.csv
+[2025-06-07 18:18:13,105] - INFO - data_loader MainThread : reading edge file: data/Factor_FACTOR_GENE_SET_GeneSet_edges.csv
+[factor—FACTOR_GENE_SET→gene_set] loaded 5089119 edges
+reading edge file: data/Trait_TRAIT_FACTOR_Factor_edges.csv
+[2025-06-07 18:19:11,612] - INFO - data_loader MainThread : reading edge file: data/Trait_TRAIT_FACTOR_Factor_edges.csv
+[trait—TRAIT_FACTOR→factor] loaded 39228 edges
+reading edge file: data/Trait_TRAIT_GENE_Gene_edges.csv
+[2025-06-07 18:19:12,161] - INFO - data_loader MainThread : reading edge file: data/Trait_TRAIT_GENE_Gene_edges.csv
+[trait—TRAIT_GENE→gene] loaded 1299086 edges
+reading edge file: data/Trait_TRAIT_GENE_SET_GeneSet_edges.csv
+[2025-06-07 18:19:31,148] - INFO - data_loader MainThread : reading edge file: data/Trait_TRAIT_GENE_SET_GeneSet_edges.csv
+[trait—TRAIT_GENE_SET→gene_set] loaded 1787999 edges
+=== Graph Statistics ===
+  • Node type 'factor': 39228 nodes
+    sample node IDs: [808284, 808285, 808286, 808287, 808288, 808289, 808290, 808291, 808292, 808293]
+  • Node type 'trait': 10423 nodes
+    sample node IDs: [604224, 604228, 604274, 604275, 604276, 604277, 604278, 604285, 604286, 604287]
+  • Node type 'gene': 22572 nodes
+    sample node IDs: [604225, 604226, 604227, 604229, 604230, 604231, 604232, 604233, 604234, 604235]
+  • Node type 'gene_set': 112945 nodes
+    sample node IDs: [720822, 720823, 720824, 720825, 720826, 720827, 720828, 720829, 720830, 720831]
+  • Edge type 'factor'—[FACTOR_GENE]→'gene': 33660962 edges
+    sample edges (src, dst, weight): [(808284, 604225, 0.07154999673366547), (870473, 604225, 0.10459999740123749), (870493, 604225, 0.027489999309182167), (870465, 604225, 0.011839999817311764), (870447, 604225, 0.025599999353289604), (870215, 604225, 0.01964999921619892), (870227, 604225, 0.01641000062227249), (870216, 604225, 0.010950000025331974), (870229, 604225, 0.018769999966025352), (870163, 604225, 0.010900000110268593)]
+  • Edge type 'factor'—[FACTOR_GENE_SET]→'gene_set': 5089119 edges
+    sample edges (src, dst, weight): [(808284, 720826, 0.0314599983394146), (808284, 735624, 0.019519999623298645), (808284, 735525, 0.01924999989569187), (808284, 720825, 0.044319998472929), (808284, 720828, 0.029190000146627426), (808284, 720824, 0.10610000044107437), (808284, 720822, 0.13420000672340393), (808284, 720823, 0.07436999678611755), (808285, 720861, 0.02246999926865101), (808285, 720832, 0.03451000154018402)]
+  • Edge type 'trait'—[TRAIT_FACTOR]→'factor': 39228 edges
+    sample edges (src, dst, weight): [(604228, 808284, 0.4350000023841858), (604344, 808291, 0.12200000137090683), (604344, 808292, 0.31299999356269836), (604344, 808300, 0.2160000056028366), (604344, 808299, 0.16599999368190765), (604344, 808296, 0.2849999964237213), (604344, 808289, 0.050200000405311584), (604344, 808294, 0.35100001096725464), (604344, 808287, 0.22499999403953552), (604344, 808295, 0.20999999344348907)]
+  • Edge type 'trait'—[TRAIT_GENE]→'gene': 1299086 edges
+    sample edges (src, dst, weight): [(604224, 604226, 1.9800000190734863), (604224, 604227, 1.7000000476837158), (604224, 604225, 1.9900000095367432), (604228, 604243, 1.440000057220459), (604228, 604251, 1.090000033378601), (604228, 604229, 5.079999923706055), (604228, 604238, 2.2699999809265137), (604228, 604234, 3.299999952316284), (604228, 604237, 2.5199999809265137), (604228, 604258, 1.0800000429153442)]
+  • Edge type 'trait'—[TRAIT_GENE_SET]→'gene_set': 1787999 edges
+    sample edges (src, dst, weight): [(604228, 720822, 1.0800000429153442), (604228, 720828, 0.011900000274181366), (604228, 720827, 0.04830000177025795), (604228, 720823, 0.4230000078678131), (604228, 720825, 0.08789999783039093), (604228, 720826, 0.21699999272823334), (604228, 720824, 1.0), (604344, 720859, 1.1100000143051147), (604344, 720871, 0.6850000023841858), (604344, 720849, 0.1940000057220459)]
+/home/ubuntu/Applications/VirtualEnvs/gnnpytorch_310/lib/python3.10/site-packages/torch_geometric/nn/conv/hetero_conv.py:76: UserWarning: There exist node types ({'trait'}) whose representations do not get updated during message passing as they do not occur as destination type in any edge type. This may lead to unexpected behavior.
+  warnings.warn(
+Epoch 001 | Loss: 9.1002
+Killed
+

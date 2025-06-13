@@ -96,6 +96,45 @@ def create_tensor_map(map_node_embeddings, map_node_ids, dataset, log=False):
   return map_result
 
 
+def create_tensor_map_by_node_type(map_node_embeddings, map_node_ids, dataset, log=False):
+  '''
+  will create a map of node embddings
+  '''
+  # initialize
+  map_result = {}
+
+  # loop through the node types
+  for node_type, map_id_to_name in map_node_ids.items():
+    map_embeddings = {}
+    logger.info("processing node type: {} with sample data: {}".format(node_type, list(map_id_to_name.items())[:5]))
+
+    # get the node embeddings for each element
+    for key_id, value_name in map_id_to_name.items():
+      # get the index and then the tensor from the embedding
+      map_ids = dataset.id_mapping.get(node_type)
+
+      # print("Looking for key: '{}' of type: {}".format(key_id, type(key_id)))
+      # print(f"Key exists: {str(key_id) in map_ids}")
+      # print(f"Result: {map_ids.get(key_id)}")
+      # logger.info("looking for id: '{}' in map: {}".format(key_id, list(map_ids.items())[:5]))
+      idx_node = map_ids.get(int(key_id), None)
+
+      if idx_node:
+        node_embedding = map_node_embeddings[node_type][idx_node]
+        # add to map_result with key as name, value as tensor
+        map_embeddings[value_name] = node_embedding
+
+      else:
+        logger.info("no index for node type: {} and id: {}".format(node_type, key_id))
+
+      # add to final map 
+      map_result[node_type] = map_embeddings
+          
+
+  # return
+  return map_result
+
+
 def main():
   """
   Main function to demonstrate usage
@@ -164,37 +203,74 @@ def save_tensors_to_csv(map_tensor, output_filename='tensor_data.csv'):
     print(f"Data saved to {output_filename}")
     print(f"DataFrame shape: {df.shape}")
     print(f"First few columns of first row:")
-    print(df.iloc[0, :5])  # Show first 5 columns of first row
+    print(df.iloc[0, :3])  # Show first 5 columns of first row
     
     return df
 
 
+def save_node_embeddings(z_dict, dataset, output_dir="embeddings"):
+    """
+    For each node type in z_dict, save a CSV:
+    <output_dir>/<node_type>_embeddings.csv
+    Columns: id, dim0, dim1, ..., dim{D-1}
+    """
+    for ntype, emb in z_dict.items():
+        # emb: tensor [num_nodes, hidden_dim]
+        arr = emb.cpu().numpy()
+        hidden_dim = arr.shape[1]
+
+        # invert the id_mapping so index → original ID
+        inv_map = {idx: orig for orig, idx in dataset.id_mapping[ntype].items()}
+        ids = [inv_map[i] for i in range(arr.shape[0])]
+
+        # build DataFrame
+        cols = [f"dim{i}" for i in range(hidden_dim)]
+        df = pd.DataFrame(arr, index=ids, columns=cols)
+        df.index.name = ntype + "_id"
+
+        # write to CSV
+        out_path = os.path.join(output_dir, f"{ntype}_embeddings.csv")
+        df.to_csv(out_path)
+        logger.info(f"Saved {ntype} embeddings to {out_path}")
+
+
 if __name__ == "__main__":
-  # get config
-  config = dutils.load_config()
+    # get config
+    config = dutils.load_config()
 
-  # data = main()
-  map_nodes = parse_node_files()
-  for map_type, map_value in map_nodes.items():
-    print("{}: {}".format(map_type, json.dumps(list(map_value.items())[:2], indent=2)))
+    # data = main()
+    map_nodes = parse_node_files()
+    for map_type, map_value in map_nodes.items():
+        print("{}: {}".format(map_type, json.dumps(list(map_value.items())[:2], indent=2)))
 
-  # get the node embeddings and the dataset for mappings of neo4j id
-  path_model = config.get(dutils.KEY_INFERENCE).get(dutils.KEY_MODEL_PATH)
-  model, data, dataset = load_model_and_data(path_model=path_model)
-  logger.info("from path: {}, got loaded model: {}".format(path_model, model))
+    # get the node embeddings and the dataset for mappings of neo4j id
+    path_model = config.get(dutils.KEY_INFERENCE).get(dutils.KEY_MODEL_PATH)
+    model, data, dataset = load_model_and_data(path_model=path_model)
+    logger.info("from path: {}, got loaded model: {}".format(path_model, model))
 
-  node_embeddings = get_node_embeddings(model, data)
-  # logger.info("got node embeddings: {}".format(node_embeddings))
-  for key, value in node_embeddings.items():
-      logger.info("for embedding key: {}, got tensor shape: {}".format(key, value.shape))
+    z_dict = get_node_embeddings(model, data)
+    # logger.info("got node embeddings: {}".format(node_embeddings))
+    for key, value in z_dict.items():
+        logger.info("for embedding key: {}, got tensor shape: {}".format(key, value.shape))
 
-  # get the map of tensors by node name
-  map_node_tensor = create_tensor_map(map_node_embeddings=get_node_embeddings(model=model, data=data), map_node_ids=map_nodes, dataset=dataset)
+    # get the map of tensors by node name
+    z_dict = get_node_embeddings(model=model, data=data)
+    #   map_node_tensor = create_tensor_map(map_node_embeddings=z_dict, map_node_ids=map_nodes, dataset=dataset)
 
-  # save the tensor map to df csv file
-  path_embeddings_file = config.get(dutils.KEY_INFERENCE).get(dutils.KEY_NODE_EMBEDDINGS)
-  save_tensors_to_csv(map_tensor=map_node_tensor, output_filename=path_embeddings_file)
-  # print("got tensor map: {}".format(map_node_tensor))
+    # get the embedding tensors by node type
+    map_embedding_by_type = create_tensor_map_by_node_type(map_node_embeddings=z_dict, map_node_ids=map_nodes, dataset=dataset)
+
+    # loop through type
+    for node_type, map_node_tensor in map_embedding_by_type.items():
+       logger.info("for node type: {} got tensor map of length: {}".format(node_type, len(map_node_tensor)))
+       path_embeddings_file = config.get(dutils.KEY_INFERENCE).get(dutils.KEY_NODE_EMBEDDINGS_BY_TYPE)
+       save_tensors_to_csv(map_tensor=map_node_tensor, output_filename=path_embeddings_file.format(node_type))
+
+
+    # # save the tensor map to df csv file
+    # path_embeddings_file = config.get(dutils.KEY_INFERENCE).get(dutils.KEY_NODE_EMBEDDINGS)
+    # save_tensors_to_csv(map_tensor=map_node_tensor, output_filename=path_embeddings_file)
+    # # print("got tensor map: {}".format(map_node_tensor))
 
 
 

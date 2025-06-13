@@ -1,0 +1,147 @@
+
+
+
+I have the following files:
+  "node_files": {
+    "factor": "data/Factor_nodes.csv",
+    "trait": "data/Trait_nodes.csv",
+    "gene": "data/Gene_nodes.csv",
+    "gene_set": "data/GeneSet_nodes.csv"
+  }
+of format with first row header:
+id,neo4j_id
+FADS1,604225
+FADS2,604226
+write a python script that reads all files and parses them into a dict by type which contains a dict from neo4j_id to id
+
+
+
+I have a heterogeneous network with the Factor, trait and gene and gene set nodes, each extracted into their own file.
+The edges are of heterogeneous type:
+        {
+            "Label": "FACTOR_GENE",
+            "Properties": [
+                    "weight"
+            ]
+        },
+        {
+            "Label": "FACTOR_GENE_SET",
+            "Properties": [
+                    "weight"
+            ]
+        },
+        {
+            "Label": "TRAIT_FACTOR",
+            "Properties": [
+                    "weight"
+            ]
+        },
+        {
+            "Label": "TRAIT_GENE",
+            "Properties": [
+                    "combined"
+            ]
+        },
+        {
+            "Label": "TRAIT_GENE_SET",
+            "Properties": [
+                    "beta_uncorrected"
+            ]
+        }
+I want to do edge inference using a GNN heterogeneous model
+create the following python code files:
+a data loading class file
+a model class file 
+a model data fitting script file which contains a method to persis the trained model to file
+a model inference script file which loads the trained model from file
+a json file containing the configuration parameters
+
+
+
+in python using data in a neo4j version 5.26 community edition database, how do I train a heterogeneous GNN model for the following node types and edge types:
+nodes list with properties:
+[
+        {
+            "Label": ":`Factor`",
+            "Properties": [
+                "id",
+                "label"
+            ]
+        },
+        {
+            "Label": ":`GeneSet`",
+            "Properties": [
+                "id"
+            ]
+        },
+        {
+            "Label": ":`Gene`",
+            "Properties": [
+                "id"
+            ]
+        },
+        {
+            "Label": ":`Trait`",
+            "Properties": [
+                "id",
+                "label"
+            ]
+        }
+]
+
+edges:
+{
+    "data": [
+        {
+            "Label": "FACTOR_GENE",
+            "Properties": [
+                [
+                    "weight"
+                ]
+            ]
+        },
+        {
+            "Label": "FACTOR_GENE_SET",
+            "Properties": [
+                [
+                    "weight"
+                ],
+                []
+            ]
+        },
+        {
+            "Label": "TRAIT_FACTOR",
+            "Properties": [
+                [
+                    "weight"
+                ]
+            ]
+        },
+        {
+            "Label": "TRAIT_GENE",
+            "Properties": [
+                [
+                    "prior",
+                    "combined"
+                ]
+            ]
+        },
+        {
+            "Label": "TRAIT_GENE_SET",
+            "Properties": [
+                [
+                    "beta_uncorrected",
+                    "beta"
+                ],
+                [
+                    "beta"
+                ],
+                []
+            ]
+        }
+    ],
+    "message": "all good"
+}
+
+
+

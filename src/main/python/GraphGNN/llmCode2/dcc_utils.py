@@ -23,6 +23,7 @@ KEY_NODE_FILES = "node_files"
 KEY_INFERENCE = "inference"
 KEY_DATA_MAPPING = "dataset_mapping"
 KEY_NODE_EMBEDDINGS = "node_embeddings"
+KEY_NODE_EMBEDDINGS_BY_TYPE = "node_embeddings_by_type"
 KEY_MODEL_PATH = "model_path"
 
 # methods
