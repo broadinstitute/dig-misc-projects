@@ -3,13 +3,34 @@
 import requests
 import json
 import constants_utils as cutils
-
+import logging
+import sys 
 
 # constants
 URL_TRANSLATOR_QUERY = "{}/query"
 
 URL_NAME_RESOLVER ="https://name-lookup.transltr.io/lookup?limit={}&string={}"
 
+logging.basicConfig(
+    level=logging.INFO, 
+    format=f'[%(asctime)s] - %(levelname)s - %(name)s %(threadName)s : %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+
+
+# methods
+def get_logger(name): 
+    # get the logger
+    logger = logging.getLogger(name)
+    # logger.addHandler(handler)
+
+    # return
+    return logger 
+
+logger = get_logger(__name__)
 
 # methods
 def query_trapi_rest_service(endpoint_url, list_target, list_predicates=["biolink:related_to"], list_source_types=[], list_target_types=[], log=False):
@@ -259,7 +280,8 @@ def query_trapi_list_for_string(list_endpoint_url, entity_name, list_ontologies,
 
     # log
     if True:
-        print("for list of curies for: {} of {}".format(entity_name, list_curies))
+        # print("for list of curies for: {} of {}".format(entity_name, list_curies))
+        logger.info("for list of curies for: {} of {}".format(entity_name, list_curies))
 
     if len(list_curies) > 0:
         # loop through trapi URLS
@@ -279,14 +301,16 @@ def query_trapi_list_for_string(list_endpoint_url, entity_name, list_ontologies,
             list_result = translate_trapi_results(map_trapi=map_trapi_response, sort=sort, descending=descending, field_to_sort=field_to_sort, log=log)
 
             # log
-            print("got num result: {} for: {}".format(len(list_result), url_trapi))
+            # print("got num result: {} for: {}".format(len(list_result), url_trapi))
+            logger.info("got num result: {} for: {}".format(len(list_result), url_trapi))
 
             # add to results
             list_total_results = list_total_results + list_result
 
     
     # log total results returns
-    print("returning for curies: {}, total results: {}".format(list_curies, len(list_total_results)))
+    # print("returning for curies: {}, total results: {}".format(list_curies, len(list_total_results)))
+    logger.info("returning for curies: {}, total results: {}".format(list_curies, len(list_total_results)))
 
     # return
     return list_total_results
@@ -308,7 +332,8 @@ def query_trapi_map_for_string(map_endpoint_url, entity_name, list_ontologies, l
 
     # log
     if True:
-        print("for list of curies for: {} of {}".format(entity_name, list_curies))
+        # print("for list of curies for: {} of {}".format(entity_name, list_curies))
+        logger.info("for list of curies for: {} of {}".format(entity_name, list_curies))
 
     if len(list_curies) > 0:
         # loop through trapi URLS
@@ -328,14 +353,16 @@ def query_trapi_map_for_string(map_endpoint_url, entity_name, list_ontologies, l
             list_result = translate_trapi_results(map_trapi=map_trapi_response, sort=sort, descending=descending, field_to_sort=field_to_sort, endpont_infores=infores_trapi, log=log)
 
             # log
-            print("got num result: {} for: {}".format(len(list_result), infores_trapi))
+            # print("got num result: {} for: {}".format(len(list_result), infores_trapi))
+            logger.info("got num result: {} for: {}".format(len(list_result), infores_trapi))
 
             # add to results
             list_total_results = list_total_results + list_result
 
     
     # log total results returns
-    print("returning for curies: {}, total results: {}".format(list_curies, len(list_total_results)))
+    # print("returning for curies: {}, total results: {}".format(list_curies, len(list_total_results)))
+    logger.info("returning for curies: {}, total results: {}".format(list_curies, len(list_total_results)))
 
     # return
     return list_total_results

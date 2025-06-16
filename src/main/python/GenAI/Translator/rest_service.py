@@ -6,17 +6,19 @@ import constants_utils as cutils
 import cypher_utils as cyutils
 
 
-from trapi_utils import query_all_trapi_for_string
+from trapi_utils import query_all_trapi_for_string, get_logger
 
 # constants
 # app = FastAPI()
 app = FastAPI(root_path="/")
+logger = get_logger(__name__)
 
 # methods
 @app.get("/get_drug_for_disease")
 def get_drug_for_disease(request: Request, input: str = Query(..., description="disease")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_DISEASE,
                                          list_predicates=cutils.LIST_PREDICATES_TREATS, list_source_types=cutils.LIST_ENTITIES_DRUG, 
                                          list_target_types=cutils.LIST_ENTITIES_DISEASE, log=False)    
@@ -28,8 +30,8 @@ def get_drug_for_disease(request: Request, input: str = Query(..., description="
 @app.get("/get_disease_for_drug")
 def get_disease_for_drug(request: Request, input: str = Query(..., description="drug")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
-
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_CHEM,
                                          list_predicates=cutils.LIST_PREDICATES_TREATS, list_source_types=cutils.LIST_ENTITIES_DISEASE, 
                                          list_target_types=cutils.LIST_ENTITIES_DRUG, log=False)    
@@ -41,7 +43,8 @@ def get_disease_for_drug(request: Request, input: str = Query(..., description="
 @app.get("/get_gene_for_disease")
 def get_gene_for_disease(request: Request, input: str = Query(..., description="disease")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_DISEASE,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_GENE, 
                                          list_target_types=cutils.LIST_ENTITIES_DISEASE, 
@@ -53,7 +56,8 @@ def get_gene_for_disease(request: Request, input: str = Query(..., description="
 @app.get("/get_disease_for_gene")
 def get_disease_for_gene(request: Request, input: str = Query(..., description="gene")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_GENE,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_DISEASE, 
                                          list_target_types=cutils.LIST_ENTITIES_GENE, 
@@ -78,7 +82,8 @@ def get_disease_for_gene(request: Request, input: str = Query(..., description="
 @app.get("/get_pathway_for_disease")
 def get_pathway_for_disease(request: Request, input: str = Query(..., description="disease")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_DISEASE,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_PATHWAY, 
                                          list_target_types=cutils.LIST_ENTITIES_DISEASE, 
@@ -91,7 +96,8 @@ def get_pathway_for_disease(request: Request, input: str = Query(..., descriptio
 @app.get("/get_disease_for_pathway")
 def get_disease_for_pathway(request: Request, input: str = Query(..., description="pathway")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_PATHWAY,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_DISEASE, 
                                          list_target_types=cutils.LIST_ENTITIES_PATHWAY, 
@@ -104,7 +110,8 @@ def get_disease_for_pathway(request: Request, input: str = Query(..., descriptio
 @app.get("/get_drug_for_pathway")
 def get_drug_for_pathway(request: Request, input: str = Query(..., description="pathway")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_PATHWAY,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_DRUG, 
                                          list_target_types=cutils.LIST_ENTITIES_PATHWAY, log=False)    
@@ -116,7 +123,8 @@ def get_drug_for_pathway(request: Request, input: str = Query(..., description="
 @app.get("/get_pathway_for_drug")
 def get_pathway_for_drug(request: Request, input: str = Query(..., description="drug")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_CHEM,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_PATHWAY, 
                                          list_target_types=cutils.LIST_ENTITIES_DRUG, log=False)    
@@ -127,6 +135,8 @@ def get_pathway_for_drug(request: Request, input: str = Query(..., description="
 
 @app.get("/get_drug_for_gene")
 def get_drug_for_gene(request: Request, input: str = Query(..., description="gene")):
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     # call the method
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_GENE,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_DRUG, 
@@ -139,7 +149,8 @@ def get_drug_for_gene(request: Request, input: str = Query(..., description="gen
 @app.get("/get_gene_for_drug")
 def get_drug_for_gene(request: Request, input: str = Query(..., description="drug")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_CHEM,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_GENE, 
                                          list_target_types=cutils.LIST_ENTITIES_DRUG, log=False)    
@@ -150,6 +161,8 @@ def get_drug_for_gene(request: Request, input: str = Query(..., description="dru
 
 @app.get("/get_cell_for_gene")
 def get_cell_for_gene(request: Request, input: str = Query(..., description="gene")):
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     # call the method
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_GENE,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_CELL, 
@@ -162,7 +175,8 @@ def get_cell_for_gene(request: Request, input: str = Query(..., description="gen
 @app.get("/get_gene_for_cell")
 def get_gene_for_cell(request: Request, input: str = Query(..., description="cell")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_CELL,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_GENE, 
                                          list_target_types=cutils.LIST_ENTITIES_CELL, log=False)    
@@ -174,8 +188,8 @@ def get_gene_for_cell(request: Request, input: str = Query(..., description="cel
 @app.get("/get_gene_for_gene")
 def get_cell_for_gene(request: Request, input: str = Query(..., description="gene")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
-
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_GENE,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ONTOLOGIES_GENE, 
                                          list_target_types=cutils.LIST_ENTITIES_GENE, log=False)    
@@ -187,7 +201,8 @@ def get_cell_for_gene(request: Request, input: str = Query(..., description="gen
 @app.get("/get_cell_for_disease")
 def get_cell_for_gene(request: Request, input: str = Query(..., description="disease")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_DISEASE,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_CELL, 
                                          list_target_types=cutils.LIST_ENTITIES_DISEASE, log=False)    
@@ -199,7 +214,8 @@ def get_cell_for_gene(request: Request, input: str = Query(..., description="dis
 @app.get("/get_disease_for_cell")
 def get_cell_for_gene(request: Request, input: str = Query(..., description="cell")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_CELL,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_DISEASE, 
                                          list_target_types=cutils.LIST_ENTITIES_CELL, log=False)    
@@ -211,7 +227,8 @@ def get_cell_for_gene(request: Request, input: str = Query(..., description="cel
 @app.get("/get_disease_for_disease")
 def get_cell_for_gene(request: Request, input: str = Query(..., description="disease")):
     # call the method
-    print("for: {}, got input: {}".format(request.url.path, input))
+    # print("for: {}, got input: {}".format(request.url.path, input))
+    logger.info("for: {}, got input: {}".format(request.url.path, input))
     list_result = query_all_trapi_for_string(entity_name=input, list_ontologies=cutils.LIST_ONTOLOGIES_DISEASE,
                                          list_predicates=cutils.LIST_PREDICATES_RELATED_TO, list_source_types=cutils.LIST_ENTITIES_DISEASE, 
                                          list_target_types=cutils.LIST_ENTITIES_DISEASE, log=False)    
