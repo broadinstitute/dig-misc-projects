@@ -58,7 +58,7 @@ def query_trapi_rest_service(endpoint_url, list_target, list_predicates=["biolin
 
         # make REST call
         response = requests.post(URL_TRANSLATOR_QUERY.format(endpoint_url), headers=headers, data=json.dumps(payload))
-        print("got response: {}".format(response))
+        # print("got response: {}".format(response))
         result = response.json()
 
         response.raise_for_status()  # Raises HTTPError for bad responses (4xx or 5xx)
@@ -265,7 +265,7 @@ def query_trapi_list_for_string(list_endpoint_url, entity_name, list_ontologies,
         # loop through trapi URLS
         for url_trapi in list_endpoint_url:
             # log
-            print("querying endpoint: {}".format(url_trapi))
+            # print("querying endpoint: {}".format(url_trapi))
 
             # do the trapi query
             map_trapi_response = query_trapi_rest_service(endpoint_url=url_trapi, list_target=list_curies, list_predicates=list_predicates, 
@@ -314,7 +314,7 @@ def query_trapi_map_for_string(map_endpoint_url, entity_name, list_ontologies, l
         # loop through trapi URLS
         for infores_trapi, url_trapi in map_endpoint_url.items():
             # log
-            print("querying infores: {} with endpoint: {}".format(infores_trapi, url_trapi))
+            # print("querying infores: {} with endpoint: {}".format(infores_trapi, url_trapi))
 
             # do the trapi query
             map_trapi_response = query_trapi_rest_service(endpoint_url=url_trapi, list_target=list_curies, list_predicates=list_predicates, 
