@@ -135,7 +135,17 @@ class HeteroNetworkDataset:
                     deg.scatter_add_(0, eidx[0], torch.ones(eidx.size(1)))
                 if d == ntype:
                     deg.scatter_add_(0, eidx[1], torch.ones(eidx.size(1)))
+
+            # 1) log1p‐transform to tame huge counts
+            deg = torch.log1p(deg)
+
+            # 2) z-score: mean=0, std=1 (clamp σ to avoid div-zero)
+            mu, sigma = deg.mean(), deg.std().clamp(min=1e-6)
+            deg = (deg - mu) / sigma
+
+            # 3) write the fully normalized degree back
             tensor[:, -1] = deg
+            # tensor[:, -1] = deg
 
             self.data.confounders[ntype] = tensor
             if debug:
