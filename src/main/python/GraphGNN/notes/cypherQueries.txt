@@ -26,3 +26,16 @@ RETURN label, count
 ORDER BY label
 
 
+
+-- get all edges by type
+MATCH (a:Gene)-[r:FACTOR_GENE]-(b:Factor)
+RETURN id(a) as source_id, properties(a) as source_props,
+        id(b) as target_id, properties(b) as target_props,
+        properties(r) as edge_props
+limit 25
+
+MATCH (a:Gene)-[r:FACTOR_GENE]-(b:Factor)
+RETURN id(a) as neo4j_sid, a.id as source_id,
+        id(b) as neo4j_tid, b.id as target_id,
+        r.weight as weight
+limit 25
