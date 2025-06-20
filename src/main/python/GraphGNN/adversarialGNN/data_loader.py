@@ -143,6 +143,12 @@ class HeteroNetworkDataset:
             mu, sigma = deg.mean(), deg.std().clamp(min=1e-6)
             deg = (deg - mu) / sigma
 
+            if True:
+                logger.info(
+                    f"  • {ntype} deg → μ={deg.mean():.3f}, σ={deg.std():.3f}, "
+                    f"min={deg.min():.3f}, max={deg.max():.3f}"
+                )            
+
             # 3) write the fully normalized degree back
             tensor[:, -1] = deg
             # tensor[:, -1] = deg
