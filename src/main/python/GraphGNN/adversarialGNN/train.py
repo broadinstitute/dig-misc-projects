@@ -30,9 +30,13 @@ def train():
     hidden_channels = config['model_params']['hidden_channels']
     confounder_dims = config['model_params']['confounder_dims']
     adv_lambda      = config['model_params'].get('adv_lambda', 0.1)
-    # model = HeteroGNN(metadata, num_nodes_dict, hidden_channels).to(device)
-    model = HeteroAdversarialGNN(metadata=metadata, num_nodes_dict=num_nodes_dict, hidden_channels=hidden_channels, 
-                                 confounder_dims=confounder_dims, adv_lambda=adv_lambda).to(device)
+    model = HeteroAdversarialGNN(
+        metadata=metadata,
+        num_nodes_dict=num_nodes_dict,
+        hidden_channels=hidden_channels,
+        confounder_dims=confounder_dims,
+        adv_lambda=adv_lambda
+    ).to(device)
 
     lr = config['training_params']['learning_rate']
     wd = config['training_params']['weight_decay']
@@ -43,61 +47,65 @@ def train():
         model.train()
         optimizer.zero_grad()
 
-        # 5) Forward pass: get node embeddings
-        # 5) Forward pass: get embeddings *and* adversarial predictions
-        # z_dict = model(data.edge_index_dict)
+        # 5) Forward pass: get embeddings *and* adversarial preds
         z_dict, adv_preds = model(data.edge_index_dict)
 
-        # 6) Compute link‐prediction loss for each relation type
-        total_loss = torch.zeros(1, device=device)
+        # 6a) Task: link-prediction loss per relation (mean), then average
+        task_losses = []
         for edge_type, edge_index in data.edge_index_dict.items():
             src_type, rel, dst_type = edge_type
             num_src = data[src_type].num_nodes
             num_dst = data[dst_type].num_nodes
 
-            # Positive scores & labels
+            # Positive samples
             pos_scores = model.decode(z_dict, edge_index, src_type, dst_type)
-            pos_labels = torch.ones(pos_scores.size(0), device=device)
+            pos_labels = torch.ones_like(pos_scores)
 
-            # ---- pure‐PyTorch negative sampling ----
-            # Draw as many random (src, dst) pairs as there are positives.
-            # Note: this may occasionally sample a real edge as "negative," 
-            # but in large graphs the chance is low.
+            # Negative sampling (equal count)
             num_pos = edge_index.size(1)
             neg_src = torch.randint(0, num_src, (num_pos,), device=device)
             neg_dst = torch.randint(0, num_dst, (num_pos,), device=device)
             neg_edge_index = torch.stack([neg_src, neg_dst], dim=0)
-            # ---------------------------------------
-
             neg_scores = model.decode(z_dict, neg_edge_index, src_type, dst_type)
-            neg_labels = torch.zeros(neg_scores.size(0), device=device)
+            neg_labels = torch.zeros_like(neg_scores)
 
-            # Combine and compute BCE loss
+            # BCE with mean reduction
             scores = torch.cat([pos_scores, neg_scores], dim=0)
             labels = torch.cat([pos_labels, neg_labels], dim=0)
-            total_loss += F.binary_cross_entropy_with_logits(scores, labels)
+            loss_rel = F.binary_cross_entropy_with_logits(scores, labels, reduction='mean')
+            task_losses.append(loss_rel)
 
-        # 6b) adversarial nuisance‐regression loss
-        L_adv = torch.zeros(1, device=device)
+        # average across all relation‐types
+        L_task = torch.stack(task_losses).mean()
+
+        # 6b) Adversarial: MSE per node‐type (mean), then average
+        adv_losses = []
         for ntype, pred in adv_preds.items():
-            # assume `data` carries a tensor of true confounders for this node‐type
-            # e.g. data.confounders[ntype] is of shape [num_nodes, confounder_dims[ntype]]
             target = data.confounders[ntype].to(device)
-            L_adv += F.mse_loss(pred, target)
+            # ensure same shape
+            if pred.shape != target.shape:
+                pred = pred.view_as(target)
+            loss_adv = F.mse_loss(pred, target, reduction='mean')
+            adv_losses.append(loss_adv)
+
+        L_adv = torch.stack(adv_losses).mean()
 
         # 6c) combine
-        total_loss = total_loss + adv_lambda * L_adv
-
+        total_loss = L_task + adv_lambda * L_adv
         total_loss.backward()
         optimizer.step()
 
-        # print(f"Epoch {epoch:03d} | Loss: {total_loss.item():.4f}")
-        logger.info(f"Epoch {epoch:03d} | Loss: {total_loss.item():.4f}")
+        logger.info(
+            f"Epoch {epoch:03d} | "
+            f"L_task: {L_task.item():.4f} | "
+            f"L_adv: {L_adv.item():.4f} | "
+            f"Total: {total_loss.item():.4f}"
+        )
 
     # 7) Save the trained model
     torch.save(model.state_dict(), config['model_path'])
-    # print(f"\nTraining complete. Model saved to: {config['model_path']}\n")
     logger.info(f"\nTraining complete. Model saved to: {config['model_path']}\n")
 
+    
 if __name__ == '__main__':
     train()

@@ -35,12 +35,12 @@
   "model_params": {
     "hidden_channels": 64,
     "confounder_dims": {
-      "factor":   2,
-      "trait":    2,
-      "gene":     2,
-      "gene_set": 2
+      "factor":   1,
+      "trait":    1,
+      "gene":     1,
+      "gene_set": 1
     },
-    "adv_lambda": 0.1
+    "adv_lambda": 0.01
   },
   "training_params": {
     "learning_rate": 0.001,
