@@ -88,7 +88,8 @@ def train():
             loss_adv = F.mse_loss(pred, target, reduction='mean')
             adv_losses.append(loss_adv)
 
-        L_adv = torch.stack(adv_losses).mean()
+        L_adv = F.mse_loss(pred, target, reduction='mean')
+        # L_adv = torch.stack(adv_losses).mean()
 
         # 6c) combine
         total_loss = L_task + adv_lambda * L_adv
@@ -106,6 +107,6 @@ def train():
     torch.save(model.state_dict(), config['model_path'])
     logger.info(f"\nTraining complete. Model saved to: {config['model_path']}\n")
 
-    
+
 if __name__ == '__main__':
     train()
