@@ -147,7 +147,7 @@ def get_node_embeddings(model, data):
 
     # 3) Run one forward pass (this applies both conv layers)
     with torch.no_grad():
-        z_dict = model(data.edge_index_dict) 
+        z_dict, _ = model(data.edge_index_dict) 
 
     # return
     return z_dict
