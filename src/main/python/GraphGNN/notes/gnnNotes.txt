@@ -58,48 +58,33 @@
         {
             "Label": "FACTOR_GENE",
             "Properties": [
-                [
                     "weight"
-                ]
             ]
         },
         {
             "Label": "FACTOR_GENE_SET",
             "Properties": [
-                [
                     "weight"
-                ],
-                []
             ]
         },
         {
             "Label": "TRAIT_FACTOR",
             "Properties": [
-                [
                     "weight"
-                ]
             ]
         },
         {
             "Label": "TRAIT_GENE",
             "Properties": [
-                [
                     "prior",
                     "combined"
-                ]
             ]
         },
         {
             "Label": "TRAIT_GENE_SET",
             "Properties": [
-                [
                     "beta_uncorrected",
                     "beta"
-                ],
-                [
-                    "beta"
-                ],
-                []
             ]
         }
     ],

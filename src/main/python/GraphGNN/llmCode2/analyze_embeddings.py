@@ -245,6 +245,218 @@ def create_umap_comparison_file_for_node_type(csv_file, node_type):
 
 
 
+def create_umap_comparison_file_for_node_type_jason_test(csv_file, node_type):
+    '''
+    creates a umap graphic file for the dataframe provided
+    '''
+    # Read data
+    file_out = "umap_parameter_comparison_for_jason2_{}.png".format(node_type)
+    df = pd.read_csv(csv_file)
+
+    # log
+    print("\nExperimenting with different UMAP parameters for node type: {}".format(node_type))
+
+    # # get the features
+    # feature_columns = [col for col in df.columns if col.startswith('val_')]
+    # features = df[feature_columns].values
+    # scaler = StandardScaler()
+    # features_scaled = scaler.fit_transform(features)
+    
+    # Try different parameter combinations
+    # param_combinations = [
+    #     {'n_neighbors': 5, 'min_dist': 0.01, 'title': 'n_neighbors=5, min_dist=0.01'},
+    #     {'n_neighbors': 30, 'min_dist': 0.5, 'title': 'n_neighbors=30, min_dist=0.5'},
+    #     {'n_neighbors': 15, 'min_dist': 0.1, 'title': 'n_neighbors=15, min_dist=0.1 (default)'}
+    # ]
+    
+    param_combinations = [
+        # # very extreme: almost purely local structure
+        # {'n_neighbors': 3,  'min_dist': 0.001,  'title': 'n_neighbors=3,  min_dist=0.001'},
+
+        # # still small neighbor‐count but allow slight breathing room
+        # {'n_neighbors': 5,  'min_dist': 0.005,  'title': 'n_neighbors=5,  min_dist=0.005'},
+
+        # {'n_neighbors': 5, 'min_dist': 0.01, 'title': 'n_neighbors=5, min_dist=0.01'},
+
+        # # a bit more neighbors to capture slightly larger “micro‐clusters”
+        # {'n_neighbors': 10, 'min_dist': 0.002,  'title': 'n_neighbors=10, min_dist=0.002'},
+
+        # # mid‐range neighbor count but force ultra‐tight packing
+        # {'n_neighbors': 15, 'min_dist': 0.001,  'title': 'n_neighbors=15, min_dist=0.001'},
+
+        # you can also experiment with the 'spread' param—
+        # e.g. spread=0.3 makes clusters even more condensed
+        {'n_neighbors': 10, 'min_dist': 0.01,  'spread': 0.3,
+        'title': 'n_neighbors=10, min_dist=0.01, spread=0.3'},
+    ]
+
+    # fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+    for i, params in enumerate(param_combinations):
+        # Calculate row and column indices
+        row = i // 3
+        col = i % 3
+
+        embedding = get_umap_of_embeddings(df=df, params=params)
+
+        # umap_reducer = umap.UMAP(
+        #     n_neighbors=params['n_neighbors'],
+        #     min_dist=params['min_dist'],
+        #     n_components=2,
+        #     random_state=42
+        # )
+
+        # # umap
+        # embedding = umap_reducer.fit_transform(features_scaled)
+        
+        # split the embeddin df based on value of y dimension
+        # mask = df['embedding'].apply(lambda vec: vec[1] > 0)
+        mask = embedding[:, 1] > 0
+
+        # features_scaled_pos   = features_scaled[ mask ]   # rows where embedding[:,1] > 0
+        # features_scaled_nonpos = features_scaled[~mask ]  # rows where embedding[:,1] <= 0
+
+        # embedding_pos = umap_reducer.fit_transform(features_scaled_pos)
+        # embedding_nonpos = umap_reducer.fit_transform(features_scaled_nonpos)
+
+        embedding_pos = get_umap_of_embeddings(df=df[mask], params=params)
+        embedding_nonpos = get_umap_of_embeddings(df=df[~mask], params=params)
+
+        title_plot = [params['title'], 'y_umap pos', 'y_umap neg']
+
+        print("got 2 dataframes of shape: {} and {} from shape: {}".format(embedding_pos.shape, embedding_nonpos.shape, embedding.shape))
+
+        for index_row, df_to_plot in enumerate([embedding, embedding_pos, embedding_nonpos]):
+            print("doing row: {}".format(index_row))
+            axes[index_row].scatter(df_to_plot[:, 0], df_to_plot[:, 1], alpha=0.7, s=50)
+            axes[index_row].set_title(title_plot[index_row])
+            axes[index_row].set_xlabel('UMAP Dimension 1')
+            axes[index_row].set_ylabel('UMAP Dimension 2')
+            axes[index_row].grid(True, alpha=0.3)
+            
+            # axes[row, index_row].scatter(df_to_plot[:, 0], df_to_plot[:, 1], alpha=0.7, s=50)
+            # axes[row, index_row].set_title(title_plot[index_row])
+            # axes[row, index_row].set_xlabel('UMAP Dimension 1')
+            # axes[row, index_row].set_ylabel('UMAP Dimension 2')
+            # axes[row, index_row].grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.savefig(file_out, dpi=300, bbox_inches='tight')
+    plt.show()
+    
+    print("Parameter comparison plot saved as '{}'".format(file_out))
+
+
+def get_umap_of_embeddings(df, params):
+    # scale
+    feature_columns = [col for col in df.columns if col.startswith('val_')]
+    features = df[feature_columns].values
+    scaler = StandardScaler()
+    features_scaled = scaler.fit_transform(features)
+
+    # umap
+    umap_reducer = umap.UMAP(
+        n_neighbors=params['n_neighbors'],
+        min_dist=params['min_dist'],
+        n_components=2,
+        random_state=42
+    )
+
+    # umap
+    embedding = umap_reducer.fit_transform(features_scaled)
+
+    # return
+    return embedding
+
+
+def create_umap_comparison_dataframes_for_node_type(csv_file, node_type, only_xy=False):
+    '''
+    creates dataframes with UMAP x/y coordinates for different parameter combinations
+    and saves them to CSV files
+    '''
+    # Read data
+    df = pd.read_csv(csv_file)
+
+    # log
+    print("\nCreating UMAP dataframes with different parameters for node type: {}".format(node_type))
+
+    # get the features
+    feature_columns = [col for col in df.columns if col.startswith('val_')]
+    features = df[feature_columns].values
+    scaler = StandardScaler()
+    features_scaled = scaler.fit_transform(features)
+    
+    # Try different parameter combinations
+    param_combinations = [
+        # very extreme: almost purely local structure
+        {'n_neighbors': 3,  'min_dist': 0.001,  'title': 'n_neighbors_3_min_dist_0.001'},
+
+        # still small neighbor‐count but allow slight breathing room
+        {'n_neighbors': 5,  'min_dist': 0.005,  'title': 'n_neighbors_5_min_dist_0.005'},
+
+        {'n_neighbors': 5, 'min_dist': 0.01, 'title': 'n_neighbors_5_min_dist_0.01'},
+
+        # a bit more neighbors to capture slightly larger "micro‐clusters"
+        {'n_neighbors': 10, 'min_dist': 0.002,  'title': 'n_neighbors_10_min_dist_0.002'},
+
+        # mid‐range neighbor count but force ultra‐tight packing
+        {'n_neighbors': 15, 'min_dist': 0.001,  'title': 'n_neighbors_15_min_dist_0.001'},
+
+        # you can also experiment with the 'spread' param—
+        # e.g. spread=0.3 makes clusters even more condensed
+        {'n_neighbors': 10, 'min_dist': 0.01,  'spread': 0.3,
+        'title': 'n_neighbors_10_min_dist_0.01_spread_0.3'},
+    ]
+
+    saved_files = []
+    
+    for i, params in enumerate(param_combinations):
+        print(f"Processing parameter combination {i+1}/{len(param_combinations)}: {params['title']}")
+        
+        # Create UMAP reducer with current parameters
+        umap_params = {
+            'n_neighbors': params['n_neighbors'],
+            'min_dist': params['min_dist'],
+            'n_components': 2,
+            'random_state': 42
+        }
+        
+        # Add spread parameter if specified
+        if 'spread' in params:
+            umap_params['spread'] = params['spread']
+            
+        umap_reducer = umap.UMAP(**umap_params)
+        embedding = umap_reducer.fit_transform(features_scaled)
+        
+        # Create dataframe with original data plus UMAP coordinates
+        if only_xy:
+            result_df = pd.DataFrame({
+                'key': df['key'],
+                'umap_x': embedding[:, 0],
+                'umap_y': embedding[:, 1]
+            })                 
+        else:
+            result_df = df.copy()
+            result_df['umap_x'] = embedding[:, 0]
+            result_df['umap_y'] = embedding[:, 1]
+
+        # Create filename
+        file_out = f"umap_data_{node_type}_{params['title']}.csv"
+        
+        # Save to CSV
+        result_df.to_csv(file_out, index=False)
+        saved_files.append(file_out)
+        
+        print(f"  Saved: {file_out}")
+    
+    print(f"\nAll UMAP dataframes saved for node type '{node_type}':")
+    for file in saved_files:
+        print(f"  - {file}")
+    
+    return saved_files
+
+
 # Example usage
 if __name__ == "__main__":
     # load configuration
@@ -257,7 +469,12 @@ if __name__ == "__main__":
     for node_type in ['gene']:
         csv_file = file_name.format(node_type)
 
-        create_umap_comparison_file_for_node_type(csv_file=csv_file, node_type=node_type)
+        # create_umap_comparison_file_for_node_type(csv_file=csv_file, node_type=node_type)
+        # create_umap_comparison_dataframes_for_node_type(csv_file=csv_file, node_type=node_type, only_xy=True)
+        create_umap_comparison_file_for_node_type_jason_test(csv_file=csv_file, node_type=node_type)
+
+
+
     # # Replace 'your_data.csv' with the path to your CSV file
     # csv_file = file_name.format('gene')
     

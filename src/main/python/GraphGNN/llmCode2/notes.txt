@@ -33,6 +33,31 @@ F456,G789,0.42
 
 
 
+20250615 - run llmcode2 GNN (simple) on data
+- properties for edges to train on
+  - beta_uncorrected for trait gene set
+  - combined for trait gene
+
+  - vi command: :%s/old_term/new_term/g
+
+[2025-06-12 14:47:10,367] - INFO - __main__ MainThread : Epoch 1997 | Loss: 1.3822
+[2025-06-12 14:50:09,795] - INFO - __main__ MainThread : Epoch 1998 | Loss: 1.3835
+[2025-06-12 14:53:06,976] - INFO - __main__ MainThread : Epoch 1999 | Loss: 1.3836
+[2025-06-12 14:56:04,699] - INFO - __main__ MainThread : Epoch 2000 | Loss: 1.3869
+[2025-06-12 14:56:04,744] - INFO - __main__ MainThread :
+
+
+- notes
+  - get loss down to 1.7 in 2k epochs -> 2 days
+  - get node embeddings per type
+  - genes clustered in 2 groups
+    - confounder issues with 
+      - size of gene sets 
+      - some genes in more gene sets than other genes 
+      - there are mouse gene sets, and only 1/2 of genes are in them 
+      - size of GWAS studies, so some traits with strong signals 
+      
+
 
 20250607 - run 01 on VM cpu
 
