@@ -24,7 +24,7 @@
                     {
                         "name": "list_gene",
                         "in": "query",
-                        "description": "The gene name for which to find associated drug associations.\nExample: \"PPARG,BM2\".",
+                        "description": "The gene name for which to find associated disease associations.\nExample: \"PPARG,BM2\".",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -51,7 +51,7 @@
                                                         "properties": {
                                                             "id": {
                                                                 "type": "string",
-                                                                "description": "Compact identifier (CURIE) for the disease entity.\nTypically a CHEBI identifier.",
+                                                                "description": "Compact identifier (CURIE) for the disease entity.\nTypically a Orphanet identifier.",
                                                                 "example": "Orpha:2631"
                                                             }
                                                         }
@@ -60,6 +60,70 @@
                                                         "type": "number",
                                                         "format": "float",
                                                         "description": "The computed score that reflects the strength of association between the gene and disease\nExample: 2.875909686 indicates that the gene is strongly genetically associated with the disease.",
+                                                        "example": 2.875909686
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input parameter. Ensure the \"input\" query parameter is provided and correctly formatted."
+                    },
+                    "500": {
+                        "description": "Internal server error. Indicates a problem with processing the request."
+                    }
+                }
+            }
+        },
+        "/get_diseases_for_pheno_list": {
+            "get": {
+                "operationId": "getDiseaseForPhenoList",
+                "summary": "Retrieve disease associated with a given list of comma seperated phenotype codes",
+                "description": "Returns a ranked list of diseases (objects) that are associated with a specified list of comma seperated phenotype codes (input).",
+                "parameters": [
+                    {
+                        "name": "list_phenotype",
+                        "in": "query",
+                        "description": "The phenotype code name for which to find associated disease associations.\nExample: \"PPARG,BM2\".",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with disease-phenotype code associations.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "array",
+                                            "description": "List of disease-phenotype code association records.",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "disease": {
+                                                        "type": "object",
+                                                        "description": "Information about the disease associated with the phenotype code.",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "description": "Compact identifier (CURIE) for the disease entity.\nTypically a Orphanet identifier.",
+                                                                "example": "Orpha:2631"
+                                                            }
+                                                        }
+                                                    },
+                                                    "score": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "description": "The computed score that reflects the strength of association between the phenotype code and disease\nExample: 2.875909686 indicates that the gene is strongly genetically associated with the disease.",
                                                         "example": 2.875909686
                                                     }
                                                 }

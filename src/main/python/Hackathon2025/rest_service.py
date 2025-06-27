@@ -34,12 +34,12 @@ def get_diseases_for_genes(
 @app.get("/get_diseases_for_pheno_list")
 def get_diseases_for_genes(
     request: Request,
-    list_gene: str = Query(..., description="PPARG")
+    list_phenotype: str = Query(..., description="HP.101010")
     ):
-    print("for: {}, got gene input: {}".format(request.url.path, list_gene))
+    print("for: {}, got gene input: {}".format(request.url.path, list_phenotype))
 
     # get the list
-    list_for_method = safe_split(string_input=list_gene)
+    list_for_method = safe_split(string_input=list_phenotype)
 
     # call your new method that takes a list of strings
     list_result = dutils.get_list_disease_for_entity_list(list_input=list_for_method, for_genes=False)
