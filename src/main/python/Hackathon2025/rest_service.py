@@ -17,13 +17,23 @@ logger = dutils.get_logger(__name__)
 @app.get("/get_diseases_for_gene_list")
 def get_diseases_for_genes(
     request: Request,
-    list_gene: List[str] = Query(..., description="PPARG")
+    list_gene: str = Query(..., description="PPARG")
     ):
-    print("for: %s, got gene input: %s", request.url.path, list_gene)
+    print("for: {}, got gene input: {}".format(request.url.path, list_gene))
+
+    # get the list
+    list_for_method = safe_split(string_input=list_gene)
 
     # call your new method that takes a list of strings
-    list_result = dutils.get_list_disease_for_gene_list(gene_list=list_gene)
+    list_result = dutils.get_list_disease_for_gene_list(gene_list=list_for_method)
 
     return JSONResponse(content={"result": list_result})
 
 
+def safe_split(string_input, delimiter=','):
+    """
+    Split a string by delimiter, returning empty list for empty/None strings
+    """
+    if not string_input or string_input.strip() == '':
+        return []
+    return [item.strip() for item in string_input.split(delimiter)]

@@ -1,8 +1,8 @@
 {
     "openapi": "3.1.0",
     "info": {
-        "title": "Gene MCP Drug for Disease Translator API",
-        "description": "This API retrieves drugs associated with a given disease using the Model Context Protocol (MCP).\nExample query: Find drugs associated with \"drug-induced liver injury\".",
+        "title": "Gene MCP Drug for Disease Hackathon25 API",
+        "description": "This API retrieves diseases associated with a given genes.\nExample query: Find diseases associated with \"PPARGy\".",
         "version": "1.0.0",
         "contact": {
             "name": "Broad Institute Translator Team",
@@ -22,7 +22,7 @@
                 "description": "Returns a ranked list of diseases (objects) that are associated with a specified list of comma seperated genes (input).",
                 "parameters": [
                     {
-                        "name": "input",
+                        "name": "list_gene",
                         "in": "query",
                         "description": "The gene name for which to find associated drug associations.\nExample: \"PPARG,BM2\".",
                         "required": true,
