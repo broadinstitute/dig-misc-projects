@@ -8,6 +8,8 @@ import sys
 # constants
 DEBUG = False
 DIR_DATA = '/Users/mduby/Data/Broad/Hackathon25/Data'
+
+FILE_HPO = "{}/hpo_id.csv".format(DIR_DATA)
 FILE_GENES = '{}/orphanet_genes.txt'.format(DIR_DATA)
 # FILE_PHENOTYPES = '{}/orphanet_all_frequency_hpo.txt'.format(DIR_DATA)
 FILE_PHENOTYPES = '{}/phen_small.txt'.format(DIR_DATA)
@@ -32,6 +34,26 @@ def get_logger(name):
     return logger 
 
 logger = get_logger(__name__)
+
+
+def read_hpo_terms(filename=FILE_HPO):
+    """
+    Read HPO terms CSV file into a dictionary.
+    
+    Args:
+        filename (str): Path to the CSV file
+        
+    Returns:
+        dict: Dictionary with HPO_terms as keys and Description as values
+    """
+    hpo_dict = {}
+    
+    with open(filename, 'r', newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            hpo_dict[row['HPO_terms'].replace(':', '.')] = row['Description']
+    
+    return hpo_dict
 
 
 def load_gene_disease_mapping(file_path):
@@ -187,7 +209,7 @@ def get_list_disease_for_entity_list(list_input, max_value=1000, for_genes=True)
         # first replace the : by . for all entries
         list_updated = [s.replace(':', '.') for s in list_input]
         print("for input: {}, got: {}".format(list_input, list_updated))
-        
+
         # get the map of disease
         map_disease = get_map_disease_for_pheno_list(list_phenotypes=list_updated)
 
@@ -237,4 +259,8 @@ if __name__ == "__main__":
         list_disease = map_pheno.get(pheno, {})
         print("\ngot {} for gene: {}".format(list_disease, pheno))
 
-
+    # read hpo map
+    map_hpo = read_hpo_terms()
+    list_pheno = ['HP.0000175', 'HP.0000995', 'HP.0001269']
+    for pheno in list_pheno:
+        print("for hpo: {}, got name: {}".format(pheno, map_hpo.get(pheno)))
