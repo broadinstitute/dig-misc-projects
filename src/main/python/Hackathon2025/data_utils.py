@@ -9,7 +9,8 @@ import sys
 DEBUG = False
 DIR_DATA = '/Users/mduby/Data/Broad/Hackathon25/Data'
 FILE_GENES = '{}/orphanet_genes.txt'.format(DIR_DATA)
-FILE_PHENOTYPES = '{}/orphanet_all_frequency_hpo.txt'.format(DIR_DATA)
+# FILE_PHENOTYPES = '{}/orphanet_all_frequency_hpo.txt'.format(DIR_DATA)
+FILE_PHENOTYPES = '{}/phen_small.txt'.format(DIR_DATA)
 
 logging.basicConfig(
     level=logging.INFO, 
@@ -138,6 +139,27 @@ def get_map_disease_for_gene_list(list_genes):
     # return
     return map_result
 
+
+def get_map_disease_for_pheno_list(list_phenotypes):
+    '''
+    return a map of disease with concatenated scores
+    '''
+    # initialize
+    map_result = {}
+
+    # get the gene data
+    for pheno in list_phenotypes:
+        list_disease = MAP_PHENOTYPES.get(pheno, [])
+        for item in list_disease:
+            for key, value in item.items():
+                map_result[key] = map_result.get(key, 0.0) + value
+
+    # sort
+
+    # return
+    return map_result
+
+
 def translate_map_to_sorted_list(map_disease):
     # initialize
     list_disease = []
@@ -153,12 +175,20 @@ def translate_map_to_sorted_list(map_disease):
     return sorted_list_desc
 
 
-def get_list_disease_for_gene_list(gene_list, max_value=1000):
-    # get the map of disease
-    map_disease = get_map_disease_for_gene_list(list_genes=gene_list)
+def get_list_disease_for_entity_list(list_input, max_value=1000, for_genes=True):
+    if for_genes:
+        # get the map of disease
+        map_disease = get_map_disease_for_gene_list(list_genes=list_input)
 
-    # get the sorted list
-    list_disease = translate_map_to_sorted_list(map_disease=map_disease)
+        # get the sorted list
+        list_disease = translate_map_to_sorted_list(map_disease=map_disease)
+
+    else:
+        # get the map of disease
+        map_disease = get_map_disease_for_pheno_list(list_phenotypes=list_input)
+
+        # get the sorted list
+        list_disease = translate_map_to_sorted_list(map_disease=map_disease)
 
     # return number wanted
     return list_disease[:max_value]
@@ -190,7 +220,7 @@ if __name__ == "__main__":
     print("\nfor list of genes: {}, got formatted  list of diseases: {}".format(list_gene, translate_map_to_sorted_list(map_disease=list_disease)))
 
     # rest call test
-    list_disease = get_list_disease_for_gene_list(gene_list=list_gene)
+    list_disease = get_list_disease_for_entity_list(list_input=list_gene)
     print("\nfor list of genes: {}, got REST list of diseases: {}".format(list_gene, list_disease))
 
     # load the pheno file
