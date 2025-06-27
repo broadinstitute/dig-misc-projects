@@ -62,7 +62,7 @@ def load_gene_disease_mapping(file_path):
                 except ValueError:
                     # skip malformed weights
                     continue
-                gene_dict.setdefault(gene, []).append({disease_id: weight})
+                gene_dict.setdefault(gene, []).append({'Orpha:{}'.format(disease_id): weight})
 
     # sort
     for key, value in gene_dict.items():
@@ -114,6 +114,57 @@ def load_pheno_disease_mapping(file_path):
 def sort_list(list_of_dicts):
     return sorted(list_of_dicts, key=lambda x: list(x.values())[0], reverse=True)
 
+# constants
+MAP_GENES = load_gene_disease_mapping(file_path=FILE_GENES)
+MAP_PHENOTYPES = load_pheno_disease_mapping(file_path=FILE_PHENOTYPES)
+
+def get_map_disease_for_gene_list(list_genes):
+    '''
+    return a map of disease with concatenated scores
+    '''
+    # initialize
+    map_result = {}
+    map_sorted = {}
+
+    # get the gene data
+    for gene in list_genes:
+        list_disease = MAP_GENES.get(gene, [])
+        for item in list_disease:
+            for key, value in item.items():
+                map_result[key] = map_result.get(key, 0.0) + value
+
+    # sort
+
+    # return
+    return map_result
+
+def translate_map_to_sorted_list(map_disease):
+    # initialize
+    list_disease = []
+
+    # loop
+    for key, value in map_disease.items():
+        list_disease.append({'disease': {'id': key}, 'score': value})
+
+    # sort
+    sorted_list_desc = sorted(list_disease, key=lambda x: x['score'], reverse=True)
+
+    # return
+    return sorted_list_desc
+
+
+def get_list_disease_for_gene_list(gene_list, max_value=1000):
+    # get the map of disease
+    map_disease = get_map_disease_for_gene_list(list_genes=gene_list)
+
+    # get the sorted list
+    list_disease = translate_map_to_sorted_list(map_disease=map_disease)
+
+    # return number wanted
+    return list_disease[:max_value]
+
+
+# main
 if __name__ == "__main__":
     # instantiate
     map_genes = {}
@@ -124,7 +175,8 @@ if __name__ == "__main__":
     file_pheno = FILE_PHENOTYPES
 
     # load the file
-    map_genes = load_gene_disease_mapping(file_path=file_genes)
+    # map_genes = load_gene_disease_mapping(file_path=file_genes)
+    map_genes = MAP_GENES
 
     # test
     list_gene = ['NFIA', 'BMP2', 'L2HGDH', 'PPARG']
@@ -132,13 +184,23 @@ if __name__ == "__main__":
         list_disease = map_genes.get(gene, {})
         print("got {} for gene: {}".format(list_disease, gene))
 
+    # test the gene list
+    list_disease = get_map_disease_for_gene_list(list_genes=list_gene)
+    print("\nfor list of genes: {}, got map of diseases: {}".format(list_gene, list_disease))
+    print("\nfor list of genes: {}, got formatted  list of diseases: {}".format(list_gene, translate_map_to_sorted_list(map_disease=list_disease)))
+
+    # rest call test
+    list_disease = get_list_disease_for_gene_list(gene_list=list_gene)
+    print("\nfor list of genes: {}, got REST list of diseases: {}".format(list_gene, list_disease))
+
     # load the pheno file
-    map_pheno = load_pheno_disease_mapping(file_path=file_pheno)
+    # map_pheno = load_pheno_disease_mapping(file_path=file_pheno)
+    map_pheno = MAP_PHENOTYPES
 
     # test
     list_pheno = ['HP.0000175', 'HP.0000995', 'HP.0001269']
     for pheno in list_pheno:
         list_disease = map_pheno.get(pheno, {})
-        print("got {} for gene: {}".format(list_disease, pheno))
+        print("\ngot {} for gene: {}".format(list_disease, pheno))
 
 
