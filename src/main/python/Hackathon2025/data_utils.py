@@ -184,8 +184,12 @@ def get_list_disease_for_entity_list(list_input, max_value=1000, for_genes=True)
         list_disease = translate_map_to_sorted_list(map_disease=map_disease)
 
     else:
+        # first replace the : by . for all entries
+        list_updated = [s.replace(':', '.') for s in list_input]
+        print("for input: {}, got: {}".format(list_input, list_updated))
+        
         # get the map of disease
-        map_disease = get_map_disease_for_pheno_list(list_phenotypes=list_input)
+        map_disease = get_map_disease_for_pheno_list(list_phenotypes=list_updated)
 
         # get the sorted list
         list_disease = translate_map_to_sorted_list(map_disease=map_disease)
