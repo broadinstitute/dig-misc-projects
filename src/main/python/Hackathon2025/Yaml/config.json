@@ -53,6 +53,11 @@
                                                                 "type": "string",
                                                                 "description": "Compact identifier (CURIE) for the disease entity.\nTypically a Orphanet identifier.",
                                                                 "example": "Orpha:2631"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Name for the disease entity.",
+                                                                "example": "Propionic acidemia"
                                                             }
                                                         }
                                                     },
@@ -117,6 +122,11 @@
                                                                 "type": "string",
                                                                 "description": "Compact identifier (CURIE) for the disease entity.\nTypically a Orphanet identifier.",
                                                                 "example": "Orpha:2631"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "description": "Name for the disease entity.",
+                                                                "example": "Propionic acidemia"
                                                             }
                                                         }
                                                     },

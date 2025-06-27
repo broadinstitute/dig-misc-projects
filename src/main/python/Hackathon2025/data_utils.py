@@ -10,6 +10,7 @@ DEBUG = False
 DIR_DATA = '/Users/mduby/Data/Broad/Hackathon25/Data'
 
 FILE_HPO = "{}/hpo_id.csv".format(DIR_DATA)
+FILE_ORPHANET = "{}/Orpha_id.tsv".format(DIR_DATA)
 FILE_GENES = '{}/orphanet_genes.txt'.format(DIR_DATA)
 # FILE_PHENOTYPES = '{}/orphanet_all_frequency_hpo.txt'.format(DIR_DATA)
 FILE_PHENOTYPES = '{}/phen_small.txt'.format(DIR_DATA)
@@ -36,7 +37,35 @@ def get_logger(name):
 logger = get_logger(__name__)
 
 
-def read_hpo_terms(filename=FILE_HPO):
+def load_orpha_terms(filename=FILE_ORPHANET):
+    """
+    Read Orpha terms file into a dictionary.
+    
+    Args:
+        filename (str): Path to the file (tab or space separated)
+        
+    Returns:
+        dict: Dictionary with OrphaID as keys and Name as values
+    """
+    orpha_dict = {}
+    
+    with open(filename, 'r', encoding='utf-8') as file:
+        # Skip header line
+        next(file)
+        
+        for line in file:
+            line = line.strip()
+            if line:  # Skip empty lines
+                # Split on whitespace (handles both tabs and spaces)
+                parts = line.split(None, 1)  # Split on first whitespace only
+                if len(parts) == 2:
+                    orpha_id, name = parts
+                    orpha_dict[orpha_id] = name
+    
+    return orpha_dict
+
+
+def load_hpo_terms(filename=FILE_HPO):
     """
     Read HPO terms CSV file into a dictionary.
     
@@ -139,7 +168,11 @@ def sort_list(list_of_dicts):
 
 # constants
 MAP_GENES = load_gene_disease_mapping(file_path=FILE_GENES)
+print("loaded gene map of size: {}".format(len(MAP_GENES)))
 MAP_PHENOTYPES = load_pheno_disease_mapping(file_path=FILE_PHENOTYPES)
+print("loaded phenotype map of size: {}".format(len(MAP_PHENOTYPES)))
+MAP_ORPHANET = load_orpha_terms()
+print("loaded orpahnet map of size: {}".format(len(MAP_ORPHANET)))
 
 def get_map_disease_for_gene_list(list_genes):
     '''
@@ -188,7 +221,8 @@ def translate_map_to_sorted_list(map_disease):
 
     # loop
     for key, value in map_disease.items():
-        list_disease.append({'disease': {'id': key}, 'score': value})
+        name = MAP_ORPHANET.get(key.replace('Orpha:', ''), key)
+        list_disease.append({'disease': {'id': key, 'name': name}, 'score': value})
 
     # sort
     sorted_list_desc = sorted(list_disease, key=lambda x: x['score'], reverse=True)
@@ -260,7 +294,13 @@ if __name__ == "__main__":
         print("\ngot {} for gene: {}".format(list_disease, pheno))
 
     # read hpo map
-    map_hpo = read_hpo_terms()
+    map_hpo = load_hpo_terms()
     list_pheno = ['HP.0000175', 'HP.0000995', 'HP.0001269']
     for pheno in list_pheno:
         print("for hpo: {}, got name: {}".format(pheno, map_hpo.get(pheno)))
+
+    # read hpo map
+    map_orpha = load_orpha_terms()
+    list_orpha = ['166024', '371', '166282','45']
+    for orpha in list_orpha:
+        print("for orpha: {}, got name: {}".format(orpha, map_orpha.get(orpha)))
