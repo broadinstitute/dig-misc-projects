@@ -38,11 +38,15 @@ def create_umap_comparison_file_for_node_type_color(
     print("using embedding file: {}".format(csv_file))
     print("using mapping file: {}".format(mapping_file))
 
-    # 2. Merge so df gets a 'display_name' column
-    df = df.merge(mapping[['trait','display_name']], on='trait', how='left')
-    if df['display_name'].isnull().any():
-        missing = df.loc[df['display_name'].isnull(), 'trait'].unique()
-        print(f"Warning: no display_name found for traits: {missing}")
+    # 2. Merge so df gets a 'display_group' column
+    df = df.merge(
+        mapping[['phenotype','display_group']],
+        left_on='key', right_on='phenotype',
+        how='left'
+    )
+    if df['display_group'].isnull().any():
+        missing = df.loc[df['display_group'].isnull(), 'key'].unique()
+        print(f"Warning: no display_group found for keys: {missing}")
 
     # 3. Prepare numeric features
     feature_cols = [c for c in df.columns if c.startswith('val_')]
@@ -50,9 +54,17 @@ def create_umap_comparison_file_for_node_type_color(
     X_scaled = StandardScaler().fit_transform(X)
 
     # 4. Build a color‐map for each display name
-    labels = df['display_name'].unique()
-    cmap = plt.get_cmap('tab20')         # up to 20 distinct colors
-    color_dict = {lab: cmap(i) for i, lab in enumerate(labels)}
+    groups = df['display_group'].unique()
+    n = len(groups)
+    print("got usnique groups of size: {}".format(n))
+    # get an HSV colormap with exactly n equally‐spaced hues
+    cmap = plt.cm.get_cmap('hsv', n)
+    color_dict = {g: cmap(i) for i, g in enumerate(groups)}    
+    # not enough colors for 60 groups
+    # labels = df['display_group'].unique()
+    # print("got usnique groups of size: {}".format(len(labels)))
+    # cmap = plt.get_cmap('tab20')         # up to 20 distinct colors
+    # color_dict = {lab: cmap(i) for i, lab in enumerate(labels)}
 
     # 5. UMAP parameter grid
     param_combinations = [
@@ -81,8 +93,8 @@ def create_umap_comparison_file_for_node_type_color(
         ax = axes[row][col]
 
         # 7. Plot each display_name as its own scatter
-        for lab in labels:
-            mask = df['display_name'] == lab
+        for lab in groups:
+            mask = df['display_group'] == lab
             ax.scatter(
                 embedding[mask, 0],
                 embedding[mask, 1],
@@ -97,7 +109,7 @@ def create_umap_comparison_file_for_node_type_color(
         ax.set_ylabel('UMAP Dimension 2')
         ax.grid(True, alpha=0.3)
         ax.legend(
-            title='Display Name',
+            title='Display Group',
             bbox_to_anchor=(1.05, 1),
             loc='upper left',
             fontsize='small'
