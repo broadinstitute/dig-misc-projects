@@ -9,6 +9,7 @@ from sklearn.preprocessing import StandardScaler
 import warnings
 warnings.filterwarnings('ignore')
 import dcc_utils as dutils
+from typing import List
 
 
 # constants
@@ -21,22 +22,133 @@ FILE_MAPPING = "{}/pigean-phenotypes.csv".format(DIR_DATA)
 FILE_PNG = "{}/Analysis/umap_parameter_comparison_color_trait.png".format(DIR_DATA)
 
 
+# import pandas as pd
+# import umap
+# import matplotlib.pyplot as plt
+# from sklearn.preprocessing import StandardScaler
+
+
+def create_umap_comparison_file_for_node_type_color_by_group(
+        embedding_file: str,
+        mapping_file: str,
+        node_type: str,
+        include_display_groups: List[str] = None
+    ):
+    """
+    Creates a grid of UMAP plots for the embeddings in `embedding_file`,
+    coloring points by their display_group (loaded from `mapping_file`),
+    but plotting ONLY those display_groups in `include_display_groups`.
+    """
+    # 1. Read embeddings + mapping
+    df = pd.read_csv(embedding_file)
+    mapping = pd.read_csv(mapping_file)  # columns: 'phenotype','display_group'
+
+    print(f"Embedding file: {embedding_file}")
+    print(f"Mapping file:   {mapping_file}")
+
+    # 2. Merge to get display_group
+    df = df.merge(
+        mapping[['phenotype','display_group']],
+        left_on='key', right_on='phenotype',
+        how='left'
+    )
+    if df['display_group'].isnull().any():
+        missing = df.loc[df['display_group'].isnull(), 'key'].unique()
+        print(f"Warning: no display_group for keys: {missing}")
+
+    # 3. Filter to only the desired display_groups
+    if include_display_groups is not None:
+        before = len(df)
+        df = df[df['display_group'].isin(include_display_groups)].reset_index(drop=True)
+        after = len(df)
+        kept = df['display_group'].unique().tolist()
+        print(f"Filtered from {before}→{after} rows; keeping groups: {kept}")
+
+    # 4. Prepare features
+    feature_cols = [c for c in df.columns if c.startswith('val_')]
+    X = df[feature_cols].values
+    X_scaled = StandardScaler().fit_transform(X)
+
+    # 5. Build HSV palette
+    groups = df['display_group'].unique()
+    n = len(groups)
+    print(f"Plotting {len(df)} points across {n} groups")
+    cmap = plt.cm.get_cmap('hsv', n)
+    color_dict = {g: cmap(i) for i, g in enumerate(groups)}
+
+    # 6. UMAP parameter grid
+    param_combinations = [
+        {'n_neighbors': 3,  'min_dist': 0.001, 'title': 'n_n=3,  m_d=0.001'},
+        {'n_neighbors': 5,  'min_dist': 0.005, 'title': 'n_n=5,  m_d=0.005'},
+        {'n_neighbors': 5,  'min_dist': 0.01,  'title': 'n_n=5,  m_d=0.01'},
+        {'n_neighbors': 10, 'min_dist': 0.002, 'title': 'n_n=10, m_d=0.002'},
+        {'n_neighbors': 15, 'min_dist': 0.001, 'title': 'n_n=15, m_d=0.001'},
+        {'n_neighbors': 10, 'min_dist': 0.01,  'spread': 0.3,
+         'title': 'n_n=10, m_d=0.01, spread=0.3'},
+    ]
+
+    # 7. Plot
+    fig, axes = plt.subplots(2, 3, figsize=(18, 12), squeeze=False)
+    for i, params in enumerate(param_combinations):
+        row, col = divmod(i, 3)
+        reducer = umap.UMAP(
+            n_neighbors=params['n_neighbors'],
+            min_dist=params['min_dist'],
+            n_components=2,
+            random_state=42,
+            **({'spread': params['spread']} if 'spread' in params else {})
+        )
+        embedding = reducer.fit_transform(X_scaled)
+        ax = axes[row][col]
+
+        for g in groups:
+            mask = df['display_group'] == g
+            ax.scatter(
+                embedding[mask, 0],
+                embedding[mask, 1],
+                c=[color_dict[g]],
+                label=g,
+                alpha=0.8,
+                s=50
+            )
+
+        ax.set_title(params['title'])
+        ax.set_xlabel('UMAP Dimension 1')
+        ax.set_ylabel('UMAP Dimension 2')
+        ax.grid(True, alpha=0.3)
+        ax.legend(
+            title='Display Group',
+            bbox_to_anchor=(1.05, 1),
+            loc='upper left',
+            fontsize='small'
+        )
+
+    plt.tight_layout()
+    # out_path = f"umap_parameter_comparison_{node_type}.png"
+    out_path = FILE_PNG
+    plt.savefig(out_path, dpi=300, bbox_inches='tight')
+    plt.show()
+    print(f"Saved: {out_path}")
+
+
 def create_umap_comparison_file_for_node_type_color(
         csv_file: str,
         mapping_file: str,
-        node_type: str
+        node_type: str,
+        exclude_prefixes: List[str] = ['gcat', 'Orphanet']
     ):
     """
     Creates a grid of UMAP plots for the embeddings in `csv_file`,
-    coloring points by their display name (loaded from `mapping_file`).
+    coloring points by their display_group (loaded from `mapping_file`),
+    but excluding any rows whose 'key' starts with one of the
+    `exclude_prefixes`.
     """
     # 1. Read in your embeddings and your mapping
-    df = pd.read_csv(csv_file)  
-    mapping = pd.read_csv(mapping_file)  # must have 'trait' and 'display_name' columns
+    df = pd.read_csv(csv_file)
+    mapping = pd.read_csv(mapping_file)  # must have 'phenotype' and 'display_group'
 
-    # log
-    print("using embedding file: {}".format(csv_file))
-    print("using mapping file: {}".format(mapping_file))
+    print(f"Using embedding file: {csv_file}")
+    print(f"Using mapping file:   {mapping_file}")
 
     # 2. Merge so df gets a 'display_group' column
     df = df.merge(
@@ -48,25 +160,28 @@ def create_umap_comparison_file_for_node_type_color(
         missing = df.loc[df['display_group'].isnull(), 'key'].unique()
         print(f"Warning: no display_group found for keys: {missing}")
 
-    # 3. Prepare numeric features
+    # 3. Exclude unwanted prefixes (if any)
+    if exclude_prefixes:
+        excl_mask = df['key'].str.startswith(tuple(exclude_prefixes))
+        num_excl = excl_mask.sum()
+        df = df[~excl_mask].reset_index(drop=True)
+        print(f"Excluded {num_excl} rows with keys starting with {exclude_prefixes}")
+
+    # 4. Prepare numeric features
     feature_cols = [c for c in df.columns if c.startswith('val_')]
     X = df[feature_cols].values
     X_scaled = StandardScaler().fit_transform(X)
 
-    # 4. Build a color‐map for each display name
+    # 5. Build a color‐map for each display_group
     groups = df['display_group'].unique()
+    print("groups: {}".format(groups))
     n = len(groups)
-    print("got usnique groups of size: {}".format(n))
-    # get an HSV colormap with exactly n equally‐spaced hues
-    cmap = plt.cm.get_cmap('hsv', n)
-    color_dict = {g: cmap(i) for i, g in enumerate(groups)}    
-    # not enough colors for 60 groups
-    # labels = df['display_group'].unique()
-    # print("got usnique groups of size: {}".format(len(labels)))
-    # cmap = plt.get_cmap('tab20')         # up to 20 distinct colors
-    # color_dict = {lab: cmap(i) for i, lab in enumerate(labels)}
+    print(f"Plotting {len(df)} points across {n} display_groups")
 
-    # 5. UMAP parameter grid
+    cmap = plt.cm.get_cmap('hsv', n)
+    color_dict = {g: cmap(i) for i, g in enumerate(groups)}
+
+    # 6. UMAP parameter grid
     param_combinations = [
         {'n_neighbors': 3,  'min_dist': 0.001, 'title': 'n_n=3,  m_d=0.001'},
         {'n_neighbors': 5,  'min_dist': 0.005, 'title': 'n_n=5,  m_d=0.005'},
@@ -77,7 +192,7 @@ def create_umap_comparison_file_for_node_type_color(
          'title': 'n_n=10, m_d=0.01, spread=0.3'},
     ]
 
-    # 6. Set up figure
+    # 7. Set up figure
     fig, axes = plt.subplots(2, 3, figsize=(18, 12), squeeze=False)
 
     for i, params in enumerate(param_combinations):
@@ -92,14 +207,14 @@ def create_umap_comparison_file_for_node_type_color(
         embedding = reducer.fit_transform(X_scaled)
         ax = axes[row][col]
 
-        # 7. Plot each display_name as its own scatter
-        for lab in groups:
-            mask = df['display_group'] == lab
+        # 8. Plot each display_group as its own scatter
+        for g in groups:
+            mask = (df['display_group'] == g)
             ax.scatter(
                 embedding[mask, 0],
                 embedding[mask, 1],
-                c=[color_dict[lab]],
-                label=lab,
+                c=[color_dict[g]],
+                label=g,
                 alpha=0.7,
                 s=50
             )
@@ -121,6 +236,7 @@ def create_umap_comparison_file_for_node_type_color(
     plt.savefig(out_path, dpi=300, bbox_inches='tight')
     plt.show()
     print(f"Saved: {out_path}")
+
 
 
 
@@ -567,6 +683,8 @@ def create_umap_comparison_dataframes_for_node_type(csv_file, node_type, only_xy
 if __name__ == "__main__":
     # load configuration
     config = dutils.load_config()
+    display_groups = ['GLYCEMIC', 'LIPIDS', 'CARDIOVASCULAR', 'NEUROLOGICAL', 'PSYCHIATRIC', 'MUSCULOSKELETAL', 'RENAL', 'LUNG', 'STROKE', 'TYPE 1 DIABETES', 
+                      'METABOLIC', 'ENDOCRINE', 'DEVELOPMENTAL', 'VASCULAR', 'ATRIAL_FIBRILLATION', 'INFLAMMATORY_BOWEL', 'SLEEP_AND_CIRCADIAN', 'IMMUNOLOGICAL']
 
     # get the node embedding file names
     file_name = config.get(dutils.KEY_INFERENCE).get(dutils.KEY_NODE_EMBEDDINGS_BY_TYPE)
@@ -577,8 +695,9 @@ if __name__ == "__main__":
 
         # create_umap_comparison_file_for_node_type(csv_file=csv_file, node_type=node_type)
         # create_umap_comparison_dataframes_for_node_type(csv_file=csv_file, node_type=node_type, only_xy=True)
-        create_umap_comparison_file_for_node_type_color(csv_file=FILE_EMBEDDING, node_type=node_type, mapping_file=FILE_MAPPING)
+        # create_umap_comparison_file_for_node_type_color(csv_file=FILE_EMBEDDING, node_type=node_type, mapping_file=FILE_MAPPING)
 
+        create_umap_comparison_file_for_node_type_color_by_group(embedding_file=FILE_EMBEDDING, node_type=node_type, mapping_file=FILE_MAPPING, include_display_groups=display_groups)
 
 
 
