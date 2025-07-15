@@ -9,11 +9,49 @@ LLM queries:
 
 below is a list of phenotype codes and genes; get a list of disease scores for both the gene and phenotype lists 
 and then weighing the two result sets equally, list 10 rare diseases which could be linked.
+for each disease, list its name and orphanet id
 gene list:
 
 phenotype code list:
 
 
+======================================================================
+
+
+
+
+below is a list of phenotype codes and genes; get a list of disease scores for both the gene and phenotype lists 
+and then weighing the two result sets equally, list 10 rare diseases which could be linked.
+for each disease, list its name and orphanet id
+gene list:
+LZTS2
+phenotype code list:
+HP:0003011, HP:0033127, HP:0011805, HP:0004303, HP:0003198, HP:0011804, HP:0040064, HP:0009127, HP:0000118, HP:0003458, HP:0003457, HP:0030236, HP:0003202, HP:0040290, HP:0003560, HP:0003797, HP:0003741, HP:0006785, HP:0025461
+
+======================================================================
+
+
+
+below is a list of phenotype codes and genes; get a list of disease scores for both the gene and phenotype lists 
+and then weighing the two result sets equally, list 10 rare diseases which could be linked.
+gene list:
+C7
+phenotype code list:
+HP:0012638, HP:0000118, HP:0000707, HP:0001298, HP:0200134
+
+======================================================================
+
+
+
+below is a list of phenotype codes and genes; get a list of disease scores for both the gene and phenotype lists 
+and then weighing the two result sets equally, list 10 rare diseases which could be linked.
+for each disease, list its name and orphanet id
+gene list:
+IRAK1
+phenotype code list:
+HP:0001742,HP:0002109,HP:0010640,HP:0011446,HP:0025033,HP:0100326,HP:0032101,HP:0000152,HP:0000153,HP:0000163,HP:0000234,HP:0000271,HP:0000366,HP:0000600,HP:0000707,HP:0000708,HP:0000739,HP:0000765,HP:0000951,HP:0000964,HP:0000976,HP:0001047,HP:0001438,HP:0001574,HP:0001626,HP:0001871,HP:0002086,HP:0002087,HP:0002242,HP:0002813,HP:0003549,HP:0010987,HP:0011024,HP:0011123,HP:0012393,HP:0012531,HP:0012735,HP:0025031,HP:0040064
+
+======================================================================
 
 below is a list of phenotype codes and genes; get a list of disease scores for both the gene and phenotype lists 
 and then weighing the two result sets equally, list 10 rare diseases with their orphanet id which could be linked.
@@ -27,7 +65,7 @@ HP:0001438;HP:0001892;HP:0000163;HP:0009900;HP:0001551;HP:0008777;HP:0012502;HP:
 below is a list of phenotype codes and genes; get a list of disease scores for both the gene and phenotype lists 
 and then weighing the two result sets equally, list 10 rare diseases which could be linked.
 gene list:
-ING3
+ING3,LASP1,CEP152
 phenotype code list:
 HP:0025401
 
