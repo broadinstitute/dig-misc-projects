@@ -18,7 +18,8 @@ DEBUG = True
 
 DIR_DATA = "/Users/mduby/Data/Broad/PortalAI/Embeddings/20250712advGnnGeneCombinedMinusPriorEpoch300Loss0_24"
 FILE_EMBEDDING = "{}/node_embeddings_trait.csv".format(DIR_DATA)
-FILE_MAPPING = "{}/pigean-phenotypes.csv".format(DIR_DATA)
+# FILE_MAPPING = "{}/pigean-phenotypes.csv".format(DIR_DATA)
+FILE_MAPPING = "{}/pigean-phenotypesPortal.csv".format(DIR_DATA)
 FILE_PNG = "{}/Analysis/umap_parameter_comparison_color_trait.png".format(DIR_DATA)
 
 
@@ -55,6 +56,14 @@ def create_umap_comparison_file_for_node_type_color_by_group(
     if df['display_group'].isnull().any():
         missing = df.loc[df['display_group'].isnull(), 'key'].unique()
         print(f"Warning: no display_group for keys: {missing}")
+
+    # 2a. filter based on input
+    include_filters = ['gcat']
+    if include_filters:
+        excl_mask = df['key'].str.startswith(tuple(include_filters))
+        num_excl = excl_mask.sum()
+        df = df[excl_mask].reset_index(drop=True)
+        print(f"Included {num_excl} rows with keys starting with {include_filters}")
 
     # 3. Filter to only the desired display_groups
     if include_display_groups is not None:
@@ -685,6 +694,13 @@ if __name__ == "__main__":
     config = dutils.load_config()
     display_groups = ['GLYCEMIC', 'LIPIDS', 'CARDIOVASCULAR', 'NEUROLOGICAL', 'PSYCHIATRIC', 'MUSCULOSKELETAL', 'RENAL', 'LUNG', 'STROKE', 'TYPE 1 DIABETES', 
                       'METABOLIC', 'ENDOCRINE', 'DEVELOPMENTAL', 'VASCULAR', 'ATRIAL_FIBRILLATION', 'INFLAMMATORY_BOWEL', 'SLEEP_AND_CIRCADIAN', 'IMMUNOLOGICAL']
+
+    display_groups = ['GLYCEMIC', 'LIPIDS', 'CARDIOVASCULAR', 'NEUROLOGICAL', 'STROKE', 'TYPE 1 DIABETES', 
+                      'METABOLIC', 'VASCULAR']
+
+    display_groups = ['LIPIDS', 'CARDIOVASCULAR', 'NEUROLOGICAL', 'STROKE', 'TYPE 1 DIABETES', 
+                       'VASCULAR']
+
 
     # get the node embedding file names
     file_name = config.get(dutils.KEY_INFERENCE).get(dutils.KEY_NODE_EMBEDDINGS_BY_TYPE)
